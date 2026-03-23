@@ -1,0 +1,47 @@
+# Dependencies
+node_modules/
+
+# Capacitor Android build artifacts
+android/app/build/
+android/.gradle/
+android/build/
+android/local.properties
+android/.idea/
+android/app/src/main/assets/public/
+*.keystore
+*.jks
+
+# Capacitor - copied web assets (source of truth is www/)
+android/app/src/main/assets/public
+
+# Generated / temp files
+dist/
+.DS_Store
+Thumbs.db
+*.log
+*.tmp
+
+# Old duplicate / root-level files (source of truth is www/)
+index.html
+labs.html
+manifest.json
+sw.js
+index\ \(1\).html
+labs\ \(1\).html
+
+# Claude Code internal
+.claude/
+
+# Python cache
+__pycache__/
+*.pyc
+generate_icons.py
+
+# Editor
+.vscode/
+.idea/
+*.swp
+
+# Env / secrets
+.env
+.env.*
