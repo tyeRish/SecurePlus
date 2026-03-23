@@ -1,0 +1,1035 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1.0, maximum-scale=1.0">
+<title>Encryption Visualizer — SEC+ Operator</title>
+<link rel="preconnect" href="https://fonts.googleapis.com">
+<link href="https://fonts.googleapis.com/css2?family=Orbitron:wght@700&family=Rajdhani:wght@400;500;600&family=Share+Tech+Mono&display=swap" rel="stylesheet">
+<style>
+:root {
+  --bg: #0a0e1a;
+  --bg2: #0f1628;
+  --card: #131d35;
+  --accent: #00ff88;
+  --cyan: #00d4ff;
+  --red: #ff3355;
+  --orange: #ff8800;
+  --purple: #8855ff;
+  --text: #e0e8ff;
+  --text-dim: #556080;
+  --border: rgba(255,255,255,0.07);
+}
+* { box-sizing: border-box; margin: 0; padding: 0; }
+body { background: var(--bg); color: var(--text); font-family: 'Rajdhani', sans-serif; min-height: 100vh; }
+
+header {
+  background: var(--bg2);
+  border-bottom: 1px solid var(--border);
+  padding: 12px 16px;
+  display: flex;
+  align-items: center;
+  gap: 12px;
+  position: sticky;
+  top: 0;
+  z-index: 100;
+}
+.back-btn {
+  background: none;
+  border: 1px solid var(--border);
+  color: var(--text-dim);
+  padding: 6px 14px;
+  border-radius: 6px;
+  font-family: 'Share Tech Mono', monospace;
+  font-size: 12px;
+  cursor: pointer;
+}
+.back-btn:hover { border-color: var(--accent); color: var(--accent); }
+header h1 { font-family: 'Orbitron', sans-serif; font-size: 16px; color: var(--accent); letter-spacing: 1px; }
+
+.tab-bar {
+  display: flex;
+  overflow-x: auto;
+  background: var(--bg2);
+  border-bottom: 1px solid var(--border);
+  scrollbar-width: none;
+  -ms-overflow-style: none;
+}
+.tab-bar::-webkit-scrollbar { display: none; }
+.tab {
+  padding: 12px 18px;
+  font-family: 'Share Tech Mono', monospace;
+  font-size: 12px;
+  color: var(--text-dim);
+  cursor: pointer;
+  border-bottom: 2px solid transparent;
+  white-space: nowrap;
+  transition: all 0.2s;
+}
+.tab.active { color: var(--accent); border-bottom-color: var(--accent); }
+.tab:hover { color: var(--text); }
+
+.panel { display: none; padding: 16px; max-width: 700px; margin: 0 auto; }
+.panel.active { display: block; }
+
+.card {
+  background: var(--card);
+  border: 1px solid var(--border);
+  border-radius: 10px;
+  padding: 16px;
+  margin-bottom: 16px;
+}
+.card-title {
+  font-family: 'Orbitron', sans-serif;
+  font-size: 12px;
+  color: var(--accent);
+  letter-spacing: 1px;
+  margin-bottom: 10px;
+}
+.card-desc { font-size: 14px; color: var(--text-dim); line-height: 1.6; margin-bottom: 14px; }
+
+textarea, input[type="text"], input[type="password"] {
+  width: 100%;
+  background: var(--bg);
+  border: 1px solid var(--border);
+  border-radius: 6px;
+  color: var(--text);
+  font-family: 'Share Tech Mono', monospace;
+  font-size: 13px;
+  padding: 10px 12px;
+  resize: vertical;
+  margin-bottom: 10px;
+}
+textarea:focus, input:focus { outline: none; border-color: var(--accent); }
+
+.btn {
+  background: rgba(0,255,136,0.1);
+  border: 1px solid rgba(0,255,136,0.3);
+  color: var(--accent);
+  padding: 10px 18px;
+  border-radius: 6px;
+  font-family: 'Share Tech Mono', monospace;
+  font-size: 12px;
+  cursor: pointer;
+  margin-right: 8px;
+  margin-bottom: 8px;
+  transition: all 0.2s;
+}
+.btn:hover { background: rgba(0,255,136,0.2); }
+.btn.secondary {
+  background: rgba(0,212,255,0.08);
+  border-color: rgba(0,212,255,0.3);
+  color: var(--cyan);
+}
+.btn.red {
+  background: rgba(255,51,85,0.08);
+  border-color: rgba(255,51,85,0.3);
+  color: var(--red);
+}
+.btn.purple {
+  background: rgba(136,85,255,0.08);
+  border-color: rgba(136,85,255,0.3);
+  color: var(--purple);
+}
+.btn:disabled { opacity: 0.4; cursor: not-allowed; }
+
+.output-box {
+  background: var(--bg);
+  border: 1px solid var(--border);
+  border-radius: 6px;
+  padding: 12px;
+  font-family: 'Share Tech Mono', monospace;
+  font-size: 12px;
+  word-break: break-all;
+  line-height: 1.7;
+  min-height: 48px;
+  margin-top: 8px;
+}
+.output-box .label { color: var(--text-dim); font-size: 11px; margin-bottom: 4px; }
+.output-box .value { color: var(--accent); }
+.output-box .value.cyan { color: var(--cyan); }
+.output-box .value.red { color: var(--red); }
+.output-box .value.orange { color: var(--orange); }
+.output-box .value.purple { color: var(--purple); }
+
+.row { display: flex; gap: 10px; flex-wrap: wrap; }
+.col { flex: 1; min-width: 140px; }
+
+.step-list { list-style: none; margin-top: 10px; }
+.step-list li {
+  display: flex;
+  gap: 10px;
+  padding: 10px 0;
+  border-bottom: 1px solid var(--border);
+  font-size: 13px;
+  line-height: 1.5;
+}
+.step-list li:last-child { border-bottom: none; }
+.step-num {
+  min-width: 26px;
+  height: 26px;
+  background: rgba(0,255,136,0.1);
+  border: 1px solid rgba(0,255,136,0.3);
+  border-radius: 50%;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  font-family: 'Share Tech Mono', monospace;
+  font-size: 11px;
+  color: var(--accent);
+}
+.step-num.active { background: rgba(0,255,136,0.3); }
+.step-num.cyan { background: rgba(0,212,255,0.1); border-color: rgba(0,212,255,0.3); color: var(--cyan); }
+
+.diff-indicator {
+  display: inline-block;
+  background: rgba(255,51,85,0.15);
+  border: 1px solid rgba(255,51,85,0.4);
+  color: var(--red);
+  padding: 1px 5px;
+  border-radius: 3px;
+  font-size: 11px;
+}
+
+.tls-step {
+  display: flex;
+  padding: 12px;
+  gap: 12px;
+  background: var(--bg);
+  border: 1px solid var(--border);
+  border-radius: 8px;
+  margin-bottom: 8px;
+  transition: all 0.3s;
+}
+.tls-step.active { border-color: var(--accent); background: rgba(0,255,136,0.04); }
+.tls-step.done { border-color: rgba(0,255,136,0.3); opacity: 0.7; }
+.tls-arrow {
+  font-size: 18px;
+  color: var(--accent);
+  min-width: 30px;
+  text-align: center;
+  padding-top: 2px;
+}
+.tls-arrow.back { color: var(--cyan); }
+.tls-content { flex: 1; }
+.tls-title { font-family: 'Share Tech Mono', monospace; font-size: 12px; color: var(--text); margin-bottom: 4px; }
+.tls-desc { font-size: 13px; color: var(--text-dim); line-height: 1.5; }
+.tls-data { font-family: 'Share Tech Mono', monospace; font-size: 11px; color: var(--cyan); margin-top: 6px; }
+
+.progress-bar {
+  height: 3px;
+  background: rgba(255,255,255,0.05);
+  border-radius: 2px;
+  margin: 16px 0;
+  overflow: hidden;
+}
+.progress-fill {
+  height: 100%;
+  background: var(--accent);
+  border-radius: 2px;
+  transition: width 0.4s;
+}
+
+.insight {
+  background: rgba(0,255,136,0.06);
+  border-left: 3px solid var(--accent);
+  padding: 10px 12px;
+  border-radius: 0 6px 6px 0;
+  font-size: 13px;
+  color: var(--text-dim);
+  line-height: 1.6;
+  margin: 10px 0;
+}
+.insight strong { color: var(--text); }
+
+.loading { color: var(--text-dim); font-size: 13px; font-family: 'Share Tech Mono', monospace; }
+
+.hex-display {
+  background: var(--bg);
+  border: 1px solid var(--border);
+  border-radius: 6px;
+  padding: 12px;
+  font-family: 'Share Tech Mono', monospace;
+  font-size: 11px;
+  color: var(--cyan);
+  word-break: break-all;
+  line-height: 1.8;
+  margin-top: 8px;
+  max-height: 120px;
+  overflow-y: auto;
+}
+
+.color-demo {
+  display: flex;
+  gap: 12px;
+  flex-wrap: wrap;
+  margin: 12px 0;
+}
+.color-box {
+  flex: 1;
+  min-width: 120px;
+  border-radius: 8px;
+  padding: 14px 12px;
+  text-align: center;
+  font-family: 'Share Tech Mono', monospace;
+  font-size: 12px;
+  font-weight: bold;
+  border: 1px solid rgba(255,255,255,0.1);
+  transition: all 0.5s;
+}
+</style>
+</head>
+<body>
+
+<header>
+  <button class="back-btn" onclick="history.back()">← BACK</button>
+  <h1>⚡ ENCRYPTION VISUALIZER</h1>
+</header>
+
+<div class="tab-bar">
+  <div class="tab active" onclick="showTab('hashing')">HASHING</div>
+  <div class="tab" onclick="showTab('symmetric')">SYMMETRIC AES</div>
+  <div class="tab" onclick="showTab('asymmetric')">ASYMMETRIC RSA</div>
+  <div class="tab" onclick="showTab('keyx')">KEY EXCHANGE</div>
+  <div class="tab" onclick="showTab('tls')">TLS HANDSHAKE</div>
+</div>
+
+<!-- ============================================================ -->
+<!-- TAB 1: HASHING                                               -->
+<!-- ============================================================ -->
+<div class="panel active" id="tab-hashing">
+  <div class="card">
+    <div class="card-title">CRYPTOGRAPHIC HASHING — LIVE DEMO</div>
+    <div class="card-desc">A hash function takes any input and produces a fixed-length output. The same input always produces the same output. It's a one-way operation — you cannot reverse a hash to get the original data.</div>
+    <textarea id="hashInput" rows="3" placeholder="Type anything here...">Hello, Security+!</textarea>
+    <button class="btn" onclick="computeHashes()">COMPUTE HASHES</button>
+    <div id="hashOutput"></div>
+  </div>
+
+  <div class="card">
+    <div class="card-title">AVALANCHE EFFECT DEMO</div>
+    <div class="card-desc">Change a single character and the entire hash changes completely. This is called the <strong>avalanche effect</strong> — a property that makes hashes useful for integrity verification.</div>
+    <div class="row">
+      <div class="col">
+        <div style="font-size:12px;color:var(--text-dim);margin-bottom:6px">ORIGINAL INPUT:</div>
+        <input type="text" id="ava1" value="password" oninput="avalancheDemo()">
+        <div class="output-box" id="avaHash1"><div class="label">SHA-256:</div><div class="value" id="avaVal1">—</div></div>
+      </div>
+      <div class="col">
+        <div style="font-size:12px;color:var(--text-dim);margin-bottom:6px">SLIGHTLY CHANGED:</div>
+        <input type="text" id="ava2" value="Password" oninput="avalancheDemo()">
+        <div class="output-box" id="avaHash2"><div class="label">SHA-256:</div><div class="value cyan" id="avaVal2">—</div></div>
+      </div>
+    </div>
+    <div id="avaDiff" style="margin-top:8px;font-size:13px;color:var(--text-dim)"></div>
+    <div class="insight"><strong>Key insight:</strong> Even a tiny change (uppercase P) produces a completely different hash. This makes it impossible to predict what changing the input will do to the output — by design.</div>
+  </div>
+
+  <div class="card">
+    <div class="card-title">PASSWORD SALTING DEMO</div>
+    <div class="card-desc">If two users have the same password, their hashes are identical — making rainbow table attacks easy. Salting adds a unique random value to each password before hashing, making all hashes unique.</div>
+    <input type="text" id="saltPassword" value="hunter2" placeholder="Password">
+    <button class="btn" onclick="saltDemo()">DEMONSTRATE SALTING</button>
+    <div id="saltOutput"></div>
+    <div class="insight"><strong>Why this matters:</strong> If an attacker gets your hash database, identical hashes immediately reveal who shares passwords. Unique salts prevent this and defeat precomputed rainbow tables.</div>
+  </div>
+
+  <div class="card">
+    <div class="card-title">HASH ALGORITHM COMPARISON</div>
+    <ul class="step-list">
+      <li><div class="step-num active">✓</div><div><strong>SHA-256</strong> — 256-bit output. Current standard. Used in TLS, certificates, code signing. Computationally fast — use bcrypt/Argon2 for passwords.</div></li>
+      <li><div class="step-num active">✓</div><div><strong>SHA-3</strong> — 256/384/512-bit. Different internal design (Keccak sponge) from SHA-2. Backup standard in case SHA-2 weaknesses found.</div></li>
+      <li><div class="step-num red" style="background:rgba(255,51,85,0.1);border-color:rgba(255,51,85,0.3);color:var(--red)">✗</div><div><strong>SHA-1</strong> — 160-bit. Cryptographically broken (collision attacks demonstrated). Deprecated in certificates since 2017.</div></li>
+      <li><div class="step-num red" style="background:rgba(255,51,85,0.1);border-color:rgba(255,51,85,0.3);color:var(--red)">✗</div><div><strong>MD5</strong> — 128-bit. Completely broken. Collision attacks trivial (find two inputs with same hash). Never use for security. Still used for non-security checksums.</div></li>
+      <li><div class="step-num" style="background:rgba(136,85,255,0.1);border-color:rgba(136,85,255,0.3);color:var(--purple)">⊕</div><div><strong>bcrypt / Argon2</strong> — Intentionally SLOW password hashing algorithms. Add salt automatically. Configurable work factor — tune to stay expensive as hardware improves.</div></li>
+    </ul>
+  </div>
+</div>
+
+<!-- ============================================================ -->
+<!-- TAB 2: SYMMETRIC AES                                         -->
+<!-- ============================================================ -->
+<div class="panel" id="tab-symmetric">
+  <div class="card">
+    <div class="card-title">AES ENCRYPTION — LIVE DEMO</div>
+    <div class="card-desc">AES (Advanced Encryption Standard) uses the same key to encrypt and decrypt. It operates on 128-bit blocks. AES-256 uses a 256-bit key — the current gold standard for symmetric encryption.</div>
+
+    <div style="font-size:12px;color:var(--text-dim);margin-bottom:6px">PLAINTEXT MESSAGE:</div>
+    <textarea id="aesPlaintext" rows="3" placeholder="Enter your message to encrypt...">This is a secret message for Security+ study.</textarea>
+
+    <div style="font-size:12px;color:var(--text-dim);margin-bottom:6px">ENCRYPTION KEY (passphrase):</div>
+    <input type="text" id="aesKey" value="MySecretKey2024!" placeholder="Enter encryption key...">
+
+    <button class="btn" onclick="aesEncrypt()">🔒 ENCRYPT</button>
+    <button class="btn secondary" onclick="aesDecrypt()">🔓 DECRYPT</button>
+
+    <div id="aesOutput"></div>
+
+    <div class="insight">
+      <strong>How AES-GCM works:</strong> The key is derived using PBKDF2. A random 96-bit IV (Initialization Vector) is generated for each encryption — the same key + different IV = completely different ciphertext. The IV is transmitted alongside the ciphertext (it's not secret, just unique). GCM mode also provides an authentication tag — any tampering with the ciphertext is detected.
+    </div>
+  </div>
+
+  <div class="card">
+    <div class="card-title">AES MODES OF OPERATION</div>
+    <ul class="step-list">
+      <li><div class="step-num red" style="background:rgba(255,51,85,0.1);border-color:rgba(255,51,85,0.3);color:var(--red)">✗</div>
+        <div><strong>ECB (Electronic Codebook)</strong> — Broken. Each block encrypted independently. Same plaintext = same ciphertext. Patterns visible in encrypted data. <em>Never use.</em></div></li>
+      <li><div class="step-num orange" style="background:rgba(255,136,0,0.1);border-color:rgba(255,136,0,0.3);color:var(--orange)">△</div>
+        <div><strong>CBC (Cipher Block Chaining)</strong> — Each block XORed with previous ciphertext before encryption. Better than ECB, but requires padding, vulnerable to padding oracle attacks. Removed from TLS 1.3.</div></li>
+      <li><div class="step-num active">✓</div>
+        <div><strong>GCM (Galois/Counter Mode)</strong> — Stream mode (no padding needed) + authentication tag. Provides confidentiality AND integrity (AEAD). Mandatory in TLS 1.3. <em>Recommended.</em></div></li>
+      <li><div class="step-num active">✓</div>
+        <div><strong>CTR (Counter Mode)</strong> — Stream mode. Converts AES block cipher to keystream generator. No padding. Parallelizable. No authentication (add HMAC separately).</div></li>
+    </ul>
+  </div>
+
+  <div class="card">
+    <div class="card-title">ECB WEAKNESS VISUALIZATION</div>
+    <div class="card-desc">ECB mode encrypts each 16-byte block independently. This makes patterns visible. A famous example is an encrypted Linux Tux penguin image — the shape remains visible even after ECB encryption.</div>
+    <div id="ecbDemo" style="display:flex;gap:12px;justify-content:center;align-items:flex-end;margin:12px 0;flex-wrap:wrap"></div>
+    <button class="btn" onclick="ecbVisualize()">VISUALIZE ECB WEAKNESS</button>
+    <div id="ecbExplain" style="margin-top:10px"></div>
+  </div>
+</div>
+
+<!-- ============================================================ -->
+<!-- TAB 3: ASYMMETRIC RSA                                        -->
+<!-- ============================================================ -->
+<div class="panel" id="tab-asymmetric">
+  <div class="card">
+    <div class="card-title">RSA KEY GENERATION — LIVE DEMO</div>
+    <div class="card-desc">RSA uses a mathematically linked key pair: the public key encrypts (or verifies), the private key decrypts (or signs). Generate a real RSA-2048 key pair right here in your browser.</div>
+    <button class="btn" id="genKeyBtn" onclick="generateRSAKeys()">⚙️ GENERATE RSA-2048 KEY PAIR</button>
+    <div id="rsaKeyOutput"></div>
+  </div>
+
+  <div class="card" id="rsaEncryptCard" style="display:none">
+    <div class="card-title">ENCRYPT WITH PUBLIC KEY</div>
+    <div class="card-desc">Anyone with the public key can encrypt data. Only the holder of the private key can decrypt it. This is how asymmetric encryption works for confidentiality.</div>
+    <textarea id="rsaPlaintext" rows="2" placeholder="Message to encrypt (keep it short — RSA has size limits)">SEC+ exam: Oct 15th</textarea>
+    <button class="btn" onclick="rsaEncryptMsg()">🔒 ENCRYPT WITH PUBLIC KEY</button>
+    <div id="rsaEncOutput"></div>
+  </div>
+
+  <div class="card" id="rsaDecryptCard" style="display:none">
+    <div class="card-title">DECRYPT WITH PRIVATE KEY</div>
+    <div class="card-desc">The encrypted message can only be decrypted with the corresponding private key. The private key never leaves its owner.</div>
+    <button class="btn secondary" onclick="rsaDecryptMsg()">🔓 DECRYPT WITH PRIVATE KEY</button>
+    <div id="rsaDecOutput"></div>
+  </div>
+
+  <div class="card">
+    <div class="card-title">RSA vs AES — WHEN TO USE WHICH</div>
+    <ul class="step-list">
+      <li><div class="step-num active">✓</div><div><strong>RSA for key exchange</strong> — Asymmetric is ~1000× slower than AES. Used only to securely exchange a symmetric key, not to encrypt data directly.</div></li>
+      <li><div class="step-num active">✓</div><div><strong>AES for data</strong> — Once both parties have the shared symmetric key (exchanged via RSA or ECDH), all data is encrypted with fast AES.</div></li>
+      <li><div class="step-num" style="background:rgba(0,212,255,0.1);border-color:rgba(0,212,255,0.3);color:var(--cyan)">→</div><div><strong>TLS combines both</strong> — RSA/ECDH for handshake, AES-GCM for all subsequent data. Best of both worlds.</div></li>
+      <li><div class="step-num" style="background:rgba(136,85,255,0.1);border-color:rgba(136,85,255,0.3);color:var(--purple)">✍</div><div><strong>RSA for digital signatures</strong> — Sign with private key (only you can sign). Verify with public key (anyone can verify). Provides authentication and non-repudiation.</div></li>
+    </ul>
+  </div>
+
+  <div class="card">
+    <div class="card-title">KEY SIZE AND SECURITY</div>
+    <ul class="step-list">
+      <li><div class="step-num red" style="background:rgba(255,51,85,0.1);border-color:rgba(255,51,85,0.3);color:var(--red)">✗</div><div><strong>RSA-512 / RSA-1024</strong> — Broken / deprecated. Factored by researchers. Not acceptable for any modern use.</div></li>
+      <li><div class="step-num orange" style="background:rgba(255,136,0,0.1);border-color:rgba(255,136,0,0.3);color:var(--orange)">△</div><div><strong>RSA-2048</strong> — Current minimum acceptable standard. Estimated secure until ~2030. Still widely used.</div></li>
+      <li><div class="step-num active">✓</div><div><strong>RSA-3072 / RSA-4096</strong> — Recommended for long-lived keys and sensitive applications. Significantly slower.</div></li>
+      <li><div class="step-num active">✓</div><div><strong>ECDSA P-256 / P-384</strong> — Elliptic curve equivalent to RSA-3072/RSA-7680. Much smaller keys, faster operations. Preferred in modern systems.</div></li>
+    </ul>
+  </div>
+</div>
+
+<!-- ============================================================ -->
+<!-- TAB 4: KEY EXCHANGE                                          -->
+<!-- ============================================================ -->
+<div class="panel" id="tab-keyx">
+  <div class="card">
+    <div class="card-title">DIFFIE-HELLMAN KEY EXCHANGE — COLOR ANALOGY</div>
+    <div class="card-desc">DH solves the fundamental problem: how do two parties agree on a shared secret over a public (insecure) channel, without ever transmitting the secret? The color mixing analogy makes this intuitive.</div>
+
+    <div id="dhColorDemo">
+      <div class="color-demo">
+        <div class="color-box" id="dhPublic" style="background:#1a1a2e;color:#00d4ff">Public Color<br><span style="font-size:10px;opacity:0.6">(shared)</span></div>
+        <div class="color-box" id="dhAlicePriv" style="background:#1a1a2e;color:#00ff88">Alice's Secret<br><span style="font-size:10px;opacity:0.6">(private)</span></div>
+        <div class="color-box" id="dhBobPriv" style="background:#1a1a2e;color:#ff8800">Bob's Secret<br><span style="font-size:10px;opacity:0.6">(private)</span></div>
+      </div>
+      <button class="btn" onclick="dhStep(1)">STEP 1: AGREE ON PUBLIC COLOR</button>
+      <div id="dhExplain" style="margin-top:10px;font-size:13px;color:var(--text-dim);line-height:1.6"></div>
+      <div id="dhStep2" style="display:none">
+        <div class="color-demo" style="margin-top:12px">
+          <div class="color-box" id="dhAliceMix" style="background:#1a1a2e">Alice sends<br><span style="font-size:10px;opacity:0.6">public+alice</span></div>
+          <div class="color-box" id="dhBobMix" style="background:#1a1a2e">Bob sends<br><span style="font-size:10px;opacity:0.6">public+bob</span></div>
+        </div>
+        <button class="btn secondary" onclick="dhStep(2)" style="margin-top:8px">STEP 2: MIX AND EXCHANGE</button>
+      </div>
+      <div id="dhStep3" style="display:none">
+        <div class="color-demo" style="margin-top:12px">
+          <div class="color-box" id="dhAliceFinal" style="background:#1a1a2e">Alice's Final<br><span style="font-size:10px;opacity:0.6">bob+alice+pub</span></div>
+          <div class="color-box" id="dhBobFinal" style="background:#1a1a2e">Bob's Final<br><span style="font-size:10px;opacity:0.6">alice+bob+pub</span></div>
+        </div>
+        <button class="btn purple" onclick="dhStep(3)" style="margin-top:8px">STEP 3: ADD OWN SECRET → SHARED KEY</button>
+      </div>
+    </div>
+  </div>
+
+  <div class="card">
+    <div class="card-title">ECDH KEY EXCHANGE — LIVE DEMO</div>
+    <div class="card-desc">ECDH (Elliptic Curve Diffie-Hellman) is the modern version used in TLS 1.3. Alice and Bob each generate a key pair. They exchange public keys and both independently compute the same shared secret. The secret never crosses the network.</div>
+    <button class="btn" id="ecdhBtn" onclick="ecdhDemo()">RUN ECDH KEY EXCHANGE</button>
+    <div id="ecdhOutput"></div>
+  </div>
+
+  <div class="card">
+    <div class="card-title">PERFECT FORWARD SECRECY (PFS)</div>
+    <div class="card-desc">With static RSA key exchange: an attacker who records all encrypted traffic now AND later steals the private key can decrypt everything retroactively. ECDHE (Ephemeral) generates a fresh key pair for every session.</div>
+    <ul class="step-list">
+      <li><div class="step-num red" style="background:rgba(255,51,85,0.1);border-color:rgba(255,51,85,0.3);color:var(--red)">✗</div><div><strong>Static RSA (no PFS)</strong> — One private key encrypts all sessions. Compromise the private key = decrypt all past and future traffic. Removed in TLS 1.3.</div></li>
+      <li><div class="step-num active">✓</div><div><strong>ECDHE (Ephemeral)</strong> — Fresh keypair per session. Compromise one session key = one session's data. Past sessions remain secure. <em>Provides PFS.</em></div></li>
+      <li><div class="step-num active">✓</div><div><strong>TLS 1.3 mandates ECDHE</strong> — All TLS 1.3 handshakes use ephemeral key exchange. PFS is not optional — it's built in.</div></li>
+    </ul>
+  </div>
+</div>
+
+<!-- ============================================================ -->
+<!-- TAB 5: TLS HANDSHAKE                                         -->
+<!-- ============================================================ -->
+<div class="panel" id="tab-tls">
+  <div class="card">
+    <div class="card-title">TLS 1.3 HANDSHAKE — STEP BY STEP</div>
+    <div class="card-desc">Every HTTPS connection starts with a TLS handshake. Click through each step to see exactly what happens before any application data is sent. TLS 1.3 completes in just 1 round trip (1-RTT).</div>
+
+    <div class="progress-bar"><div class="progress-fill" id="tlsProgress" style="width:0%"></div></div>
+
+    <div style="display:flex;justify-content:space-between;margin-bottom:12px">
+      <div style="text-align:center;flex:1">
+        <div style="font-family:'Share Tech Mono',monospace;font-size:12px;color:var(--accent)">CLIENT</div>
+        <div style="font-size:11px;color:var(--text-dim)">(Browser)</div>
+      </div>
+      <div style="text-align:center;flex:1">
+        <div style="font-family:'Share Tech Mono',monospace;font-size:12px;color:var(--cyan)">SERVER</div>
+        <div style="font-size:11px;color:var(--text-dim)">(Web Server)</div>
+      </div>
+    </div>
+
+    <div id="tlsSteps"></div>
+
+    <div style="margin-top:12px;display:flex;gap:8px">
+      <button class="btn" id="tlsNextBtn" onclick="tlsNext()">NEXT STEP →</button>
+      <button class="btn secondary" onclick="tlsReset()">RESTART</button>
+    </div>
+
+    <div id="tlsExplain" class="insight" style="display:none;margin-top:12px"></div>
+  </div>
+
+  <div class="card">
+    <div class="card-title">TLS 1.3 vs TLS 1.2 — KEY DIFFERENCES</div>
+    <ul class="step-list">
+      <li><div class="step-num active">✓</div><div><strong>1-RTT handshake</strong> (TLS 1.3) vs 2-RTT (TLS 1.2). 0-RTT available for session resumption (with replay attack trade-off).</div></li>
+      <li><div class="step-num active">✓</div><div><strong>Mandatory ECDHE</strong> — PFS built in. TLS 1.2 allowed static RSA (no PFS).</div></li>
+      <li><div class="step-num active">✓</div><div><strong>Encrypted extensions</strong> — In TLS 1.3, most of the handshake metadata is encrypted. TLS 1.2 sent extensions in plaintext.</div></li>
+      <li><div class="step-num active">✓</div><div><strong>Removed weak ciphers</strong> — No RC4, DES, 3DES, MD5, SHA-1, CBC mode, RSA key exchange, or compression.</div></li>
+      <li><div class="step-num active">✓</div><div><strong>Only 5 cipher suites</strong> — vs 37+ in TLS 1.2. All use AEAD (AES-GCM or ChaCha20-Poly1305).</div></li>
+    </ul>
+  </div>
+
+  <div class="card">
+    <div class="card-title">CERTIFICATE CHAIN — HOW TRUST WORKS</div>
+    <ul class="step-list">
+      <li><div class="step-num" style="background:rgba(255,136,0,0.1);border-color:rgba(255,136,0,0.3);color:var(--orange)">1</div><div><strong>Root CA</strong> — Self-signed certificate from a trusted root authority (DigiCert, Let's Encrypt). Stored in OS/browser trust store. Never used directly to sign leaf certs.</div></li>
+      <li><div class="step-num" style="background:rgba(0,212,255,0.1);border-color:rgba(0,212,255,0.3);color:var(--cyan)">2</div><div><strong>Intermediate CA</strong> — Signed by Root CA. Issues end-entity (leaf) certificates. If compromised, only revoke the intermediate — not the root.</div></li>
+      <li><div class="step-num active">3</div><div><strong>Leaf Certificate</strong> — Your website's certificate. Contains: domain name, public key, validity period, issuer (Intermediate CA), digital signature.</div></li>
+      <li><div class="step-num" style="background:rgba(136,85,255,0.1);border-color:rgba(136,85,255,0.3);color:var(--purple)">✓</div><div><strong>Validation</strong> — Browser verifies each signature up the chain. All certs must be valid (not expired, not revoked, correct domain). Chain must terminate at a trusted Root CA.</div></li>
+    </ul>
+  </div>
+</div>
+
+<script>
+// ============================================================
+// UTILITIES
+// ============================================================
+function showTab(id) {
+  document.querySelectorAll('.panel').forEach(p => p.classList.remove('active'));
+  document.querySelectorAll('.tab').forEach(t => t.classList.remove('active'));
+  document.getElementById('tab-' + id).classList.add('active');
+  event.target.classList.add('active');
+}
+
+function toHex(buffer) {
+  return Array.from(new Uint8Array(buffer)).map(b => b.toString(16).padStart(2, '0')).join('');
+}
+
+function hexDiff(a, b) {
+  let diff = 0;
+  for (let i = 0; i < Math.max(a.length, b.length); i++) {
+    if (a[i] !== b[i]) diff++;
+  }
+  return Math.round(diff / Math.max(a.length, b.length) * 100);
+}
+
+async function sha256(msg) {
+  const buf = await crypto.subtle.digest('SHA-256', new TextEncoder().encode(msg));
+  return toHex(buf);
+}
+
+// ============================================================
+// TAB 1: HASHING
+// ============================================================
+async function computeHashes() {
+  const input = document.getElementById('hashInput').value;
+  if (!input.trim()) return;
+  const h256 = await sha256(input);
+  const buf512 = await crypto.subtle.digest('SHA-512', new TextEncoder().encode(input));
+  const h512 = toHex(buf512);
+  document.getElementById('hashOutput').innerHTML = `
+    <div class="output-box">
+      <div class="label">INPUT (${input.length} chars → any length):</div>
+      <div class="value" style="color:var(--text)">${input.substring(0,80)}${input.length>80?'...':''}</div>
+      <br>
+      <div class="label">SHA-256 output (always 256 bits = 64 hex chars):</div>
+      <div class="value">${h256}</div>
+      <br>
+      <div class="label">SHA-512 output (always 512 bits = 128 hex chars):</div>
+      <div class="value cyan">${h512.substring(0,64)}</div>
+      <div class="value cyan">${h512.substring(64)}</div>
+      <br>
+      <div class="label">Properties confirmed: fixed output length ✓ | deterministic ✓ | one-way ✓</div>
+    </div>`;
+}
+
+async function avalancheDemo() {
+  const v1 = document.getElementById('ava1').value;
+  const v2 = document.getElementById('ava2').value;
+  const h1 = await sha256(v1);
+  const h2 = await sha256(v2);
+  document.getElementById('avaVal1').textContent = h1;
+  document.getElementById('avaVal2').textContent = h2;
+  if (v1 && v2 && v1 !== v2) {
+    const diff = hexDiff(h1, h2);
+    document.getElementById('avaDiff').innerHTML = `<span class="diff-indicator">~${diff}% of output bits changed</span> from changing "${v1}" → "${v2}". Ideal avalanche: ~50%.`;
+  }
+}
+
+async function saltDemo() {
+  const pw = document.getElementById('saltPassword').value || 'hunter2';
+  const salt1 = crypto.getRandomValues(new Uint8Array(8));
+  const salt2 = crypto.getRandomValues(new Uint8Array(8));
+  const salt3 = crypto.getRandomValues(new Uint8Array(8));
+  const s1hex = toHex(salt1);
+  const s2hex = toHex(salt2);
+  const s3hex = toHex(salt3);
+  const h1 = await sha256(pw + s1hex);
+  const h2 = await sha256(pw + s2hex);
+  const h3 = await sha256(pw + s3hex);
+  const hNoSalt = await sha256(pw);
+  document.getElementById('saltOutput').innerHTML = `
+    <div class="output-box">
+      <div class="label">Password: "${pw}"</div>
+      <br>
+      <div class="label">❌ WITHOUT SALT — identical hash every time:</div>
+      <div class="value red">${hNoSalt}</div>
+      <div class="value red">${hNoSalt}</div>
+      <br>
+      <div class="label">✓ WITH RANDOM SALT — different hash every time:</div>
+      <div class="label">User 1 | salt: ${s1hex}</div>
+      <div class="value">${h1}</div>
+      <div class="label">User 2 | salt: ${s2hex}</div>
+      <div class="value">${h2}</div>
+      <div class="label">User 3 | salt: ${s3hex}</div>
+      <div class="value">${h3}</div>
+      <br>
+      <div class="label">Same password, 3 completely different stored hashes. Rainbow table useless. ✓</div>
+    </div>`;
+}
+
+// Auto-run avalanche demo on load
+avalancheDemo();
+
+// ============================================================
+// TAB 2: AES SYMMETRIC
+// ============================================================
+let aesKey = null;
+let aesCiphertext = null;
+let aesIv = null;
+
+async function deriveAESKey(password) {
+  const enc = new TextEncoder();
+  const keyMaterial = await crypto.subtle.importKey('raw', enc.encode(password), 'PBKDF2', false, ['deriveKey']);
+  return crypto.subtle.deriveKey(
+    { name: 'PBKDF2', salt: enc.encode('secplus-salt'), iterations: 100000, hash: 'SHA-256' },
+    keyMaterial,
+    { name: 'AES-GCM', length: 256 },
+    true,
+    ['encrypt', 'decrypt']
+  );
+}
+
+async function aesEncrypt() {
+  const plaintext = document.getElementById('aesPlaintext').value;
+  const password = document.getElementById('aesKey').value;
+  if (!plaintext || !password) return;
+  const out = document.getElementById('aesOutput');
+  out.innerHTML = '<div class="loading">⚙️ Encrypting with AES-256-GCM...</div>';
+  try {
+    aesKey = await deriveAESKey(password);
+    aesIv = crypto.getRandomValues(new Uint8Array(12));
+    aesCiphertext = await crypto.subtle.encrypt({ name: 'AES-GCM', iv: aesIv }, aesKey, new TextEncoder().encode(plaintext));
+    const ctHex = toHex(aesCiphertext);
+    const ivHex = toHex(aesIv);
+    out.innerHTML = `
+      <div class="output-box">
+        <div class="label">KEY DERIVATION: PBKDF2(password, salt, 100k iterations) → AES-256 key</div>
+        <div class="label">IV (random, 96-bit — unique per encryption):</div>
+        <div class="value orange">${ivHex}</div>
+        <br>
+        <div class="label">CIPHERTEXT (AES-256-GCM encrypted, ${aesCiphertext.byteLength} bytes):</div>
+        <div class="hex-display">${ctHex}</div>
+        <br>
+        <div class="label">✓ Encrypted. Original: "${plaintext.substring(0,40)}${plaintext.length>40?'...':''}"</div>
+        <div class="label">✓ Same key, new IV → completely different ciphertext every time</div>
+        <div class="label">✓ GCM authentication tag protects against tampering</div>
+      </div>`;
+  } catch(e) { out.innerHTML = `<div style="color:var(--red)">Error: ${e.message}</div>`; }
+}
+
+async function aesDecrypt() {
+  if (!aesKey || !aesCiphertext || !aesIv) {
+    document.getElementById('aesOutput').innerHTML = '<div style="color:var(--orange);font-size:13px">Encrypt something first!</div>';
+    return;
+  }
+  try {
+    const decrypted = await crypto.subtle.decrypt({ name: 'AES-GCM', iv: aesIv }, aesKey, aesCiphertext);
+    const text = new TextDecoder().decode(decrypted);
+    document.getElementById('aesOutput').innerHTML = `
+      <div class="output-box">
+        <div class="label">✓ DECRYPTION SUCCESSFUL</div>
+        <br>
+        <div class="label">Decrypted plaintext:</div>
+        <div class="value">${text}</div>
+        <br>
+        <div class="label">GCM authentication tag verified — data was not tampered with. ✓</div>
+      </div>`;
+  } catch(e) {
+    document.getElementById('aesOutput').innerHTML = `<div style="color:var(--red)">Decryption failed — wrong key or tampered data. This is what happens when you try to decrypt with a different key.</div>`;
+  }
+}
+
+function ecbVisualize() {
+  const blocks = [
+    {label:'Block A', color:'#1a3a5c'},
+    {label:'Block B', color:'#2d1a4f'},
+    {label:'Block C', color:'#1a3a5c'},  // same as A
+    {label:'Block D', color:'#4a1a2a'},
+    {label:'Block E', color:'#1a3a5c'},  // same as A
+    {label:'Block F', color:'#1a4a2a'},
+  ];
+  const ecbEncrypted = [
+    {label:'ENC(A)', color:'#00aaff'},
+    {label:'ENC(B)', color:'#aa00ff'},
+    {label:'ENC(A)', color:'#00aaff'},  // same encrypted output!
+    {label:'ENC(D)', color:'#ff5500'},
+    {label:'ENC(A)', color:'#00aaff'},  // same encrypted output!
+    {label:'ENC(F)', color:'#00aa55'},
+  ];
+  const gcmEncrypted = [
+    {label:'GCM-1', color:'#336677'},
+    {label:'GCM-2', color:'#884422'},
+    {label:'GCM-3', color:'#225544'},  // completely different even for same input
+    {label:'GCM-4', color:'#664433'},
+    {label:'GCM-5', color:'#443366'},
+    {label:'GCM-6', color:'#557722'},
+  ];
+
+  const container = document.getElementById('ecbDemo');
+  function makeGroup(title, items, color) {
+    return `<div style="text-align:center">
+      <div style="font-size:11px;color:var(--text-dim);margin-bottom:6px;font-family:'Share Tech Mono',monospace">${title}</div>
+      <div style="display:flex;flex-direction:column;gap:3px">
+        ${items.map(b => `<div style="background:${b.color};padding:5px 10px;border-radius:4px;font-family:'Share Tech Mono',monospace;font-size:10px;color:#fff;min-width:80px">${b.label}</div>`).join('')}
+      </div>
+    </div>`;
+  }
+
+  container.innerHTML = makeGroup('PLAINTEXT BLOCKS', blocks) +
+    '<div style="padding-top:40px;font-size:20px;color:var(--text-dim)">→</div>' +
+    makeGroup('ECB ENCRYPTED (⚠ patterns visible)', ecbEncrypted) +
+    '<div style="padding-top:40px;font-size:20px;color:var(--text-dim)">vs</div>' +
+    makeGroup('GCM ENCRYPTED (✓ no patterns)', gcmEncrypted);
+
+  document.getElementById('ecbExplain').innerHTML = `<div class="insight">
+    <strong>Notice:</strong> In ECB mode, Block A appears 3× in the plaintext → its encrypted form is identical all 3 times (blue). An attacker can see patterns without knowing the key. In AES-GCM, the same plaintext block produces a different ciphertext every time — patterns are invisible.
+  </div>`;
+}
+
+// ============================================================
+// TAB 3: RSA
+// ============================================================
+let rsaKeyPair = null;
+let rsaEncryptedData = null;
+
+async function generateRSAKeys() {
+  const btn = document.getElementById('genKeyBtn');
+  btn.disabled = true;
+  btn.textContent = '⚙️ Generating... (this takes ~2 seconds)';
+  document.getElementById('rsaKeyOutput').innerHTML = '<div class="loading">⚙️ Generating RSA-2048 key pair using Web Crypto API...</div>';
+  try {
+    rsaKeyPair = await crypto.subtle.generateKey(
+      { name: 'RSA-OAEP', modulusLength: 2048, publicExponent: new Uint8Array([1, 0, 1]), hash: 'SHA-256' },
+      true, ['encrypt', 'decrypt']
+    );
+    const pubKey = await crypto.subtle.exportKey('spki', rsaKeyPair.publicKey);
+    const privKey = await crypto.subtle.exportKey('pkcs8', rsaKeyPair.privateKey);
+    const pubHex = toHex(pubKey);
+    const privHex = toHex(privKey);
+    document.getElementById('rsaKeyOutput').innerHTML = `
+      <div class="output-box">
+        <div class="label">✓ RSA-2048 KEY PAIR GENERATED (real cryptographic keys)</div>
+        <br>
+        <div class="label">PUBLIC KEY (${pubKey.byteLength * 8} bits — shareable with anyone):</div>
+        <div class="hex-display">${pubHex.substring(0,128)}...<span style="color:var(--text-dim)">(${pubHex.length} hex chars = ${pubKey.byteLength} bytes)</span></div>
+        <br>
+        <div class="label">PRIVATE KEY (${privKey.byteLength * 8} bits — NEVER share this):</div>
+        <div class="hex-display" style="color:var(--red)">${privHex.substring(0,128)}...<span style="color:var(--text-dim)">(${privHex.length} hex chars = ${privKey.byteLength} bytes)</span></div>
+        <br>
+        <div class="label">Mathematically linked. What the public key encrypts, only the private key can decrypt.</div>
+      </div>`;
+    document.getElementById('rsaEncryptCard').style.display = 'block';
+    btn.textContent = '⚙️ REGENERATE KEY PAIR';
+    btn.disabled = false;
+  } catch(e) { document.getElementById('rsaKeyOutput').innerHTML = `<div style="color:var(--red)">Error: ${e.message}</div>`; btn.disabled = false; }
+}
+
+async function rsaEncryptMsg() {
+  if (!rsaKeyPair) return;
+  const msg = document.getElementById('rsaPlaintext').value;
+  const out = document.getElementById('rsaEncOutput');
+  try {
+    rsaEncryptedData = await crypto.subtle.encrypt({ name: 'RSA-OAEP' }, rsaKeyPair.publicKey, new TextEncoder().encode(msg));
+    const hex = toHex(rsaEncryptedData);
+    out.innerHTML = `<div class="output-box">
+      <div class="label">✓ ENCRYPTED WITH PUBLIC KEY (${rsaEncryptedData.byteLength * 8} bits)</div>
+      <div class="hex-display">${hex}</div>
+      <div style="margin-top:8px;font-size:12px;color:var(--text-dim)">This ciphertext can only be decrypted with the private key. Encrypt again and you get a completely different ciphertext (OAEP uses random padding).</div>
+    </div>`;
+    document.getElementById('rsaDecryptCard').style.display = 'block';
+  } catch(e) { out.innerHTML = `<div style="color:var(--red)">Error — RSA has a size limit. Try a shorter message. (${e.message})</div>`; }
+}
+
+async function rsaDecryptMsg() {
+  if (!rsaKeyPair || !rsaEncryptedData) return;
+  try {
+    const decrypted = await crypto.subtle.decrypt({ name: 'RSA-OAEP' }, rsaKeyPair.privateKey, rsaEncryptedData);
+    const text = new TextDecoder().decode(decrypted);
+    document.getElementById('rsaDecOutput').innerHTML = `<div class="output-box">
+      <div class="label">✓ DECRYPTED WITH PRIVATE KEY</div>
+      <div class="value">${text}</div>
+      <div style="margin-top:8px;font-size:12px;color:var(--text-dim)">The private key successfully decrypted the message that was encrypted with the public key. This is the foundation of asymmetric encryption.</div>
+    </div>`;
+  } catch(e) { document.getElementById('rsaDecOutput').innerHTML = `<div style="color:var(--red)">Decryption failed: ${e.message}</div>`; }
+}
+
+// ============================================================
+// TAB 4: KEY EXCHANGE
+// ============================================================
+let dhStep_state = 0;
+const dhColors = {
+  public: { hex: '#2244aa', name: 'Deep Blue' },
+  alice: { hex: '#aa2244', name: 'Crimson' },
+  bob: { hex: '#22aa44', name: 'Forest Green' },
+  aliceMix: { hex: '#662266', name: 'Purple (pub+alice)' },
+  bobMix: { hex: '#226644', name: 'Teal (pub+bob)' },
+  shared: { hex: '#444422', name: 'Olive (all three mixed)' }
+};
+
+function mixColors(c1, c2) {
+  const r1 = parseInt(c1.slice(1,3),16), g1 = parseInt(c1.slice(3,5),16), b1 = parseInt(c1.slice(5,7),16);
+  const r2 = parseInt(c2.slice(1,3),16), g2 = parseInt(c2.slice(3,5),16), b2 = parseInt(c2.slice(5,7),16);
+  return `rgb(${Math.floor((r1+r2)/2)},${Math.floor((g1+g2)/2)},${Math.floor((b1+b2)/2)})`;
+}
+
+function dhStep(step) {
+  const pub = document.getElementById('dhPublic');
+  const alicePriv = document.getElementById('dhAlicePriv');
+  const bobPriv = document.getElementById('dhBobPriv');
+  const explain = document.getElementById('dhExplain');
+
+  if (step === 1) {
+    pub.style.background = dhColors.public.hex;
+    pub.style.color = '#fff';
+    pub.innerHTML = `Public Color<br><strong style="font-size:11px">${dhColors.public.name}</strong><br><span style="font-size:10px;opacity:0.7">Sent over network</span>`;
+    alicePriv.style.background = dhColors.alice.hex;
+    alicePriv.style.color = '#fff';
+    alicePriv.innerHTML = `Alice's Secret<br><strong style="font-size:11px">${dhColors.alice.name}</strong><br><span style="font-size:10px;opacity:0.7">Stays with Alice</span>`;
+    bobPriv.style.background = dhColors.bob.hex;
+    bobPriv.style.color = '#fff';
+    bobPriv.innerHTML = `Bob's Secret<br><strong style="font-size:11px">${dhColors.bob.name}</strong><br><span style="font-size:10px;opacity:0.7">Stays with Bob</span>`;
+    explain.innerHTML = `Alice and Bob agree on a public color (${dhColors.public.name}). This is public — the attacker can see it. Each also picks a private color that they <strong>never share</strong>.`;
+    document.getElementById('dhStep2').style.display = 'block';
+  } else if (step === 2) {
+    const aliceMixColor = mixColors(dhColors.public.hex, dhColors.alice.hex);
+    const bobMixColor = mixColors(dhColors.public.hex, dhColors.bob.hex);
+    const aliceMix = document.getElementById('dhAliceMix');
+    const bobMix = document.getElementById('dhBobMix');
+    aliceMix.style.background = aliceMixColor;
+    aliceMix.style.color = '#fff';
+    aliceMix.innerHTML = `Alice sends<br><strong style="font-size:10px">Public+Alice mix</strong><br><span style="font-size:9px;opacity:0.7">Attacker can see this</span>`;
+    bobMix.style.background = bobMixColor;
+    bobMix.style.color = '#fff';
+    bobMix.innerHTML = `Bob sends<br><strong style="font-size:10px">Public+Bob mix</strong><br><span style="font-size:9px;opacity:0.7">Attacker can see this</span>`;
+    explain.innerHTML = `Alice mixes her secret with the public color and sends it to Bob. Bob does the same. The attacker sees both mixtures but cannot separate them to extract the private colors. <strong>Color separation is mathematically hard</strong> — this is analogous to the discrete logarithm problem.`;
+    document.getElementById('dhStep3').style.display = 'block';
+  } else if (step === 3) {
+    const shared1 = mixColors(mixColors(dhColors.public.hex, dhColors.bob.hex), dhColors.alice.hex);
+    const shared2 = mixColors(mixColors(dhColors.public.hex, dhColors.alice.hex), dhColors.bob.hex);
+    const aliceFinal = document.getElementById('dhAliceFinal');
+    const bobFinal = document.getElementById('dhBobFinal');
+    aliceFinal.style.background = shared1;
+    aliceFinal.style.color = '#fff';
+    aliceFinal.innerHTML = `Alice's Final<br><strong style="font-size:10px">pub+bob+alice</strong><br><span style="font-size:9px;color:#0f8">SHARED SECRET ✓</span>`;
+    bobFinal.style.background = shared2;
+    bobFinal.style.color = '#fff';
+    bobFinal.innerHTML = `Bob's Final<br><strong style="font-size:10px">pub+alice+bob</strong><br><span style="font-size:9px;color:#0f8">SHARED SECRET ✓</span>`;
+    explain.innerHTML = `Alice adds her secret to what Bob sent. Bob adds his secret to what Alice sent. <strong>Both arrive at the same final color — their shared secret — without it ever crossing the network.</strong> The attacker only saw: public + (public+alice) + (public+bob) — they cannot derive the secret.`;
+  }
+}
+
+async function ecdhDemo() {
+  const btn = document.getElementById('ecdhBtn');
+  btn.disabled = true;
+  btn.textContent = '⚙️ Running ECDH...';
+  const out = document.getElementById('ecdhOutput');
+  out.innerHTML = '<div class="loading">⚙️ Generating Alice and Bob ECDH P-256 key pairs...</div>';
+  try {
+    const aliceKP = await crypto.subtle.generateKey({ name: 'ECDH', namedCurve: 'P-256' }, true, ['deriveKey']);
+    const bobKP = await crypto.subtle.generateKey({ name: 'ECDH', namedCurve: 'P-256' }, true, ['deriveKey']);
+
+    const alicePub = await crypto.subtle.exportKey('raw', aliceKP.publicKey);
+    const bobPub = await crypto.subtle.exportKey('raw', bobKP.publicKey);
+
+    const aliceShared = await crypto.subtle.deriveKey(
+      { name: 'ECDH', public: bobKP.publicKey },
+      aliceKP.privateKey,
+      { name: 'AES-GCM', length: 256 }, true, ['encrypt']
+    );
+    const bobShared = await crypto.subtle.deriveKey(
+      { name: 'ECDH', public: aliceKP.publicKey },
+      bobKP.privateKey,
+      { name: 'AES-GCM', length: 256 }, true, ['encrypt']
+    );
+
+    const aliceSharedBytes = await crypto.subtle.exportKey('raw', aliceShared);
+    const bobSharedBytes = await crypto.subtle.exportKey('raw', bobShared);
+    const aliceSharedHex = toHex(aliceSharedBytes);
+    const bobSharedHex = toHex(bobSharedBytes);
+    const match = aliceSharedHex === bobSharedHex;
+
+    out.innerHTML = `<div class="output-box">
+      <div class="label">ALICE'S PUBLIC KEY (P-256, 65 bytes — sent to Bob over network):</div>
+      <div class="value" style="font-size:11px">${toHex(alicePub).substring(0,80)}...</div>
+      <br>
+      <div class="label">BOB'S PUBLIC KEY (P-256, 65 bytes — sent to Alice over network):</div>
+      <div class="value cyan" style="font-size:11px">${toHex(bobPub).substring(0,80)}...</div>
+      <br>
+      <div class="label">ALICE'S DERIVED SHARED SECRET (using Bob's public key):</div>
+      <div class="value orange">${aliceSharedHex}</div>
+      <br>
+      <div class="label">BOB'S DERIVED SHARED SECRET (using Alice's public key):</div>
+      <div class="value orange">${bobSharedHex}</div>
+      <br>
+      <div class="label" style="color:${match?'var(--accent)':'var(--red)'}">
+        ${match ? '✓ MATCH — Both derived the SAME shared secret without ever transmitting it!' : '✗ NO MATCH — something went wrong'}
+      </div>
+      <div class="label">Private keys never crossed the network. The shared secret becomes the AES session key.</div>
+    </div>`;
+    btn.textContent = 'RUN ECDH AGAIN';
+    btn.disabled = false;
+  } catch(e) { out.innerHTML = `<div style="color:var(--red)">Error: ${e.message}</div>`; btn.disabled = false; }
+}
+
+// ============================================================
+// TAB 5: TLS HANDSHAKE
+// ============================================================
+const tlsSteps = [
+  {
+    direction: '→',
+    from: 'CLIENT',
+    title: 'ClientHello',
+    data: 'TLS version: 1.3 | Cipher suites: [TLS_AES_256_GCM_SHA384, TLS_CHACHA20_POLY1305_SHA256]\nKey share: ECDH P-256 public key (64 bytes)\nRandom nonce: 32 random bytes\nSupported extensions: SNI, ALPN, session ticket',
+    explain: "The client sends its capabilities and a public key for ECDH key exchange. The random nonce prevents replay attacks. SNI (Server Name Indication) tells the server which certificate to use — important for shared hosting. At this point, nothing is encrypted yet."
+  },
+  {
+    direction: '←',
+    from: 'SERVER',
+    title: 'ServerHello + Certificate + Finished',
+    data: 'Selected cipher: TLS_AES_256_GCM_SHA384\nKey share: Server ECDH P-256 public key (64 bytes)\nRandom nonce: 32 random bytes\n--- (rest is encrypted) ---\nCertificate: [server's X.509 cert + chain]\nCertificateVerify: signed with server private key\nFinished: HMAC of entire handshake',
+    explain: "The server selects the cipher suite, sends its ECDH public key (allowing both sides to derive the shared secret now), and then immediately starts sending encrypted data — the certificate, a signature proving it holds the private key, and a Finished message. This is 1-RTT: client sends, server replies with everything needed."
+  },
+  {
+    direction: '⚙️',
+    from: 'BOTH SIDES',
+    title: 'Key Derivation (no network traffic)',
+    data: 'ECDH(client_private, server_public) = ECDH(server_private, client_public) = shared_secret\nHandshake keys → Client/Server handshake traffic secret\nApplication keys → Client/Server application traffic secret\n(derived via HKDF)',
+    explain: "Both sides independently compute the same shared secret from the ECDH exchange. They then use HKDF (HMAC-based Key Derivation Function) to derive separate keys for each direction of traffic. This happens locally — no additional network round trip."
+  },
+  {
+    direction: '↔',
+    from: 'CLIENT',
+    title: 'Client Certificate Verify + Finished',
+    data: 'Finished: HMAC over entire handshake transcript\n(confirms client derived the same keys)\n--- CLIENT AUTHENTICATION OPTIONAL ---\nClientCertificate + CertificateVerify (if mutual TLS)',
+    explain: "The client sends a Finished message — an HMAC over the entire handshake using the derived keys. If the server gets this, it proves: (1) the client has the right keys, (2) nothing was tampered with in transit. Mutual TLS (mTLS) optionally authenticates the client too — used in zero-trust architectures."
+  },
+  {
+    direction: '↔',
+    from: 'BOTH SIDES',
+    title: 'Application Data — Encrypted',
+    data: 'All subsequent data encrypted with AES-256-GCM\nSeparate keys for each direction\nSequence numbers prevent replay attacks\nAuthentication tag on every record detects tampering',
+    explain: "The TLS handshake is complete. All application data (HTTP requests, responses) is now encrypted with AES-256-GCM using the derived session keys. Each record has an authentication tag — any modification to the encrypted data is immediately detected. The entire handshake took just 1 round trip."
+  }
+];
+
+let tlsCurrent = 0;
+
+function tlsReset() {
+  tlsCurrent = 0;
+  document.getElementById('tlsProgress').style.width = '0%';
+  document.getElementById('tlsSteps').innerHTML = '';
+  document.getElementById('tlsExplain').style.display = 'none';
+  document.getElementById('tlsNextBtn').textContent = 'NEXT STEP →';
+  document.getElementById('tlsNextBtn').disabled = false;
+}
+
+function tlsNext() {
+  if (tlsCurrent >= tlsSteps.length) return;
+  const step = tlsSteps[tlsCurrent];
+  const container = document.getElementById('tlsSteps');
+  const div = document.createElement('div');
+  div.className = 'tls-step active';
+  const isBack = step.direction === '←';
+  const isBoth = step.direction === '↔' || step.direction === '⚙️';
+  div.innerHTML = `
+    <div class="tls-arrow ${isBack ? 'back' : ''}">${step.direction}</div>
+    <div class="tls-content">
+      <div class="tls-title">${step.title}</div>
+      <div class="tls-data">${step.data}</div>
+    </div>`;
+  container.appendChild(div);
+  setTimeout(() => { const prev = container.querySelectorAll('.tls-step'); prev.forEach((p,i) => { if (i < prev.length-1) p.classList.add('done'); p.classList.remove('active'); }); div.classList.add('active'); }, 50);
+  div.scrollIntoView({ behavior: 'smooth', block: 'nearest' });
+
+  const explain = document.getElementById('tlsExplain');
+  explain.style.display = 'block';
+  explain.innerHTML = `<strong>Step ${tlsCurrent+1}/${tlsSteps.length}:</strong> ${step.explain}`;
+
+  tlsCurrent++;
+  document.getElementById('tlsProgress').style.width = `${(tlsCurrent / tlsSteps.length) * 100}%`;
+
+  if (tlsCurrent >= tlsSteps.length) {
+    document.getElementById('tlsNextBtn').textContent = '✓ HANDSHAKE COMPLETE';
+    document.getElementById('tlsNextBtn').disabled = true;
+  }
+}
+
+tlsReset();
+</script>
+</body>
+</html>

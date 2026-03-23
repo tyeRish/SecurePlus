@@ -22,12 +22,12 @@ Thumbs.db
 *.tmp
 
 # Old duplicate / root-level files (source of truth is www/)
-index.html
-labs.html
-manifest.json
-sw.js
-index\ \(1\).html
-labs\ \(1\).html
+/index.html
+/labs.html
+/manifest.json
+/sw.js
+/index\ \(1\).html
+/labs\ \(1\).html
 
 # Claude Code internal
 .claude/
