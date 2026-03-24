@@ -961,7 +961,7 @@ const tlsSteps = [
     direction: '←',
     from: 'SERVER',
     title: 'ServerHello + Certificate + Finished',
-    data: 'Selected cipher: TLS_AES_256_GCM_SHA384\nKey share: Server ECDH P-256 public key (64 bytes)\nRandom nonce: 32 random bytes\n--- (rest is encrypted) ---\nCertificate: [server's X.509 cert + chain]\nCertificateVerify: signed with server private key\nFinished: HMAC of entire handshake',
+    data: 'Selected cipher: TLS_AES_256_GCM_SHA384\nKey share: Server ECDH P-256 public key (64 bytes)\nRandom nonce: 32 random bytes\n--- (rest is encrypted) ---\nCertificate: [server X.509 cert + chain]\nCertificateVerify: signed with server private key\nFinished: HMAC of entire handshake',
     explain: "The server selects the cipher suite, sends its ECDH public key (allowing both sides to derive the shared secret now), and then immediately starts sending encrypted data — the certificate, a signature proving it holds the private key, and a Finished message. This is 1-RTT: client sends, server replies with everything needed."
   },
   {
