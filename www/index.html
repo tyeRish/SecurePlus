@@ -816,15 +816,6 @@
   </div>
 </div>
 
-<!-- INSTALL BANNER -->
-<div class="install-banner" id="installBanner" onclick="installApp()">
-  <span style="font-size:24px">📲</span>
-  <div class="install-text">
-    <strong>Add to Home Screen</strong>
-    Install for notifications & offline access
-  </div>
-  <span class="install-close" onclick="event.stopPropagation(); document.getElementById('installBanner').classList.add('hidden')">×</span>
-</div>
 
 <!-- SCREENS -->
 <div class="main">
@@ -1835,9 +1826,48 @@ function saveState() {
 // ============================================================
 // NAVIGATION
 // ============================================================
+const screenHistory = [];
+
 function showScreen(id) {
+  const current = document.querySelector('.screen.active');
+  if (current && current.id !== id) screenHistory.push(current.id);
   document.querySelectorAll('.screen').forEach(s => s.classList.remove('active'));
   document.getElementById(id).classList.add('active');
+}
+
+function goBack() {
+  if (screenHistory.length > 0) {
+    const prev = screenHistory.pop();
+    document.querySelectorAll('.screen').forEach(s => s.classList.remove('active'));
+    document.getElementById(prev).classList.add('active');
+  } else {
+    showToast("I've given'er all she's got, Captain!");
+  }
+}
+
+function showToast(msg) {
+  let toast = document.getElementById('appToast');
+  if (!toast) {
+    toast = document.createElement('div');
+    toast.id = 'appToast';
+    toast.style.cssText = 'position:fixed;bottom:80px;left:50%;transform:translateX(-50%);background:rgba(0,212,255,0.15);border:1px solid #00d4ff;color:#00d4ff;font-family:"Share Tech Mono",monospace;font-size:13px;padding:10px 20px;border-radius:8px;z-index:9999;opacity:0;transition:opacity 0.3s;pointer-events:none;text-align:center;max-width:80%';
+    document.body.appendChild(toast);
+  }
+  toast.textContent = msg;
+  toast.style.opacity = '1';
+  clearTimeout(toast._t);
+  toast._t = setTimeout(() => { toast.style.opacity = '0'; }, 2500);
+}
+
+// Android hardware/gesture back button
+document.addEventListener('deviceready', () => {
+  if (window.Capacitor && window.Capacitor.Plugins && window.Capacitor.Plugins.App) {
+    window.Capacitor.Plugins.App.addListener('backButton', goBack);
+  }
+});
+// Fallback for when Capacitor is already ready
+if (window.Capacitor && window.Capacitor.Plugins && window.Capacitor.Plugins.App) {
+  window.Capacitor.Plugins.App.addListener('backButton', goBack);
 }
 
 function navTo(screenId, navId) {
@@ -2228,30 +2258,6 @@ function showLesson(id) {
   showScreen('lessonDetailScreen');
 }
 
-// ============================================================
-// PWA INSTALL
-// ============================================================
-let deferredPrompt;
-window.addEventListener('beforeinstallprompt', (e) => {
-  e.preventDefault();
-  deferredPrompt = e;
-  document.getElementById('installBanner').classList.remove('hidden');
-});
-
-function installApp() {
-  if (deferredPrompt) {
-    deferredPrompt.prompt();
-    deferredPrompt.userChoice.then(() => {
-      deferredPrompt = null;
-      document.getElementById('installBanner').classList.add('hidden');
-    });
-  }
-}
-
-// Hide install banner if already installed
-if (window.matchMedia('(display-mode: standalone)').matches) {
-  document.getElementById('installBanner').classList.add('hidden');
-}
 
 // ============================================================
 // SERVICE WORKER + NOTIFICATIONS

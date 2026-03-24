@@ -1,0 +1,305 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=1024">
+<title>Feature Graphic — SEC+ Operator</title>
+<link href="https://fonts.googleapis.com/css2?family=Orbitron:wght@400;700;900&family=Rajdhani:wght@400;500;600;700&family=Share+Tech+Mono&display=swap" rel="stylesheet">
+<style>
+* { margin: 0; padding: 0; box-sizing: border-box; }
+
+body {
+  width: 1024px;
+  height: 500px;
+  overflow: hidden;
+  background: #0a0e1a;
+  font-family: 'Rajdhani', sans-serif;
+}
+
+.bg {
+  position: absolute;
+  inset: 0;
+  background:
+    radial-gradient(ellipse at 15% 50%, rgba(0,212,255,0.12) 0%, transparent 55%),
+    radial-gradient(ellipse at 85% 50%, rgba(0,255,136,0.08) 0%, transparent 55%),
+    radial-gradient(ellipse at 50% 100%, rgba(136,85,255,0.08) 0%, transparent 50%),
+    repeating-linear-gradient(0deg, transparent, transparent 40px, rgba(255,255,255,0.015) 40px, rgba(255,255,255,0.015) 41px),
+    repeating-linear-gradient(90deg, transparent, transparent 40px, rgba(255,255,255,0.015) 40px, rgba(255,255,255,0.015) 41px);
+}
+
+.scanline {
+  position: absolute;
+  inset: 0;
+  background: repeating-linear-gradient(
+    0deg,
+    transparent,
+    transparent 2px,
+    rgba(0,0,0,0.08) 2px,
+    rgba(0,0,0,0.08) 4px
+  );
+  pointer-events: none;
+}
+
+.content {
+  position: relative;
+  z-index: 10;
+  display: flex;
+  align-items: center;
+  height: 100%;
+  padding: 0 64px;
+  gap: 60px;
+}
+
+/* LEFT — branding */
+.left {
+  flex: 1;
+  display: flex;
+  flex-direction: column;
+  gap: 0;
+}
+
+.operator-label {
+  font-family: 'Share Tech Mono', monospace;
+  font-size: 11px;
+  color: #00d4ff;
+  letter-spacing: 5px;
+  text-transform: uppercase;
+  margin-bottom: 10px;
+  opacity: 0.8;
+}
+
+.logo-line {
+  display: flex;
+  align-items: baseline;
+  gap: 4px;
+  margin-bottom: 6px;
+}
+
+.logo-sec {
+  font-family: 'Orbitron', monospace;
+  font-size: 72px;
+  font-weight: 900;
+  color: #00d4ff;
+  text-shadow: 0 0 40px rgba(0,212,255,0.6), 0 0 80px rgba(0,212,255,0.2);
+  line-height: 1;
+  letter-spacing: -2px;
+}
+
+.logo-plus {
+  font-family: 'Orbitron', monospace;
+  font-size: 72px;
+  font-weight: 900;
+  color: #00ff88;
+  text-shadow: 0 0 40px rgba(0,255,136,0.6), 0 0 80px rgba(0,255,136,0.2);
+  line-height: 1;
+}
+
+.logo-ops {
+  font-family: 'Orbitron', monospace;
+  font-size: 28px;
+  font-weight: 700;
+  color: rgba(255,255,255,0.5);
+  letter-spacing: 6px;
+  margin-bottom: 24px;
+}
+
+.tagline {
+  font-size: 18px;
+  font-weight: 500;
+  color: rgba(224,232,255,0.75);
+  line-height: 1.5;
+  max-width: 380px;
+  margin-bottom: 28px;
+}
+
+.tagline strong { color: #fff; font-weight: 700; }
+
+.pills {
+  display: flex;
+  gap: 10px;
+  flex-wrap: wrap;
+}
+
+.pill {
+  font-family: 'Share Tech Mono', monospace;
+  font-size: 11px;
+  padding: 5px 12px;
+  border-radius: 4px;
+  border: 1px solid;
+  letter-spacing: 1px;
+}
+
+.pill-cyan  { color: #00d4ff; border-color: rgba(0,212,255,0.4); background: rgba(0,212,255,0.08); }
+.pill-green { color: #00ff88; border-color: rgba(0,255,136,0.4); background: rgba(0,255,136,0.08); }
+.pill-purple{ color: #8855ff; border-color: rgba(136,85,255,0.4); background: rgba(136,85,255,0.08); }
+.pill-orange{ color: #ff8800; border-color: rgba(255,136,0,0.4);  background: rgba(255,136,0,0.08); }
+
+/* RIGHT — mock UI card */
+.right {
+  width: 320px;
+  display: flex;
+  flex-direction: column;
+  gap: 10px;
+}
+
+.mock-card {
+  background: #131d35;
+  border: 1px solid rgba(255,255,255,0.08);
+  border-radius: 12px;
+  padding: 16px;
+}
+
+.mock-header {
+  font-family: 'Share Tech Mono', monospace;
+  font-size: 9px;
+  color: #556080;
+  letter-spacing: 3px;
+  margin-bottom: 10px;
+}
+
+.mock-question {
+  font-size: 13px;
+  font-weight: 600;
+  color: #ff8800;
+  line-height: 1.4;
+  margin-bottom: 12px;
+}
+
+.mock-options {
+  display: flex;
+  flex-direction: column;
+  gap: 6px;
+}
+
+.mock-opt {
+  background: #0f1628;
+  border: 1px solid rgba(255,255,255,0.07);
+  border-radius: 6px;
+  padding: 7px 10px;
+  font-size: 12px;
+  color: rgba(224,232,255,0.8);
+  display: flex;
+  align-items: center;
+  gap: 8px;
+}
+
+.mock-opt.correct {
+  border-color: rgba(0,255,136,0.5);
+  background: rgba(0,255,136,0.06);
+  color: #00ff88;
+}
+
+.opt-letter {
+  font-family: 'Share Tech Mono', monospace;
+  font-size: 10px;
+  color: #556080;
+  min-width: 14px;
+}
+
+.mock-opt.correct .opt-letter { color: #00ff88; }
+
+.mock-stats {
+  display: flex;
+  gap: 8px;
+}
+
+.stat-card {
+  flex: 1;
+  background: #131d35;
+  border: 1px solid rgba(255,255,255,0.08);
+  border-radius: 10px;
+  padding: 12px;
+  text-align: center;
+}
+
+.stat-val {
+  font-family: 'Orbitron', monospace;
+  font-size: 22px;
+  font-weight: 700;
+  margin-bottom: 3px;
+}
+
+.stat-lbl {
+  font-family: 'Share Tech Mono', monospace;
+  font-size: 9px;
+  color: #556080;
+  letter-spacing: 1px;
+}
+
+/* corner decoration */
+.corner {
+  position: absolute;
+  width: 60px;
+  height: 60px;
+  border-color: rgba(0,212,255,0.2);
+  border-style: solid;
+}
+.corner-tl { top: 20px; left: 20px; border-width: 2px 0 0 2px; }
+.corner-tr { top: 20px; right: 20px; border-width: 2px 2px 0 0; }
+.corner-bl { bottom: 20px; left: 20px; border-width: 0 0 2px 2px; }
+.corner-br { bottom: 20px; right: 20px; border-width: 0 2px 2px 0; }
+</style>
+</head>
+<body>
+
+<div class="bg"></div>
+<div class="scanline"></div>
+
+<div class="corner corner-tl"></div>
+<div class="corner corner-tr"></div>
+<div class="corner corner-bl"></div>
+<div class="corner corner-br"></div>
+
+<div class="content">
+
+  <div class="left">
+    <div class="operator-label">// CompTIA SY0-701</div>
+    <div class="logo-line">
+      <div class="logo-sec">SEC</div>
+      <div class="logo-plus">+</div>
+    </div>
+    <div class="logo-ops">OPERATOR</div>
+    <div class="tagline">
+      <strong>120 questions. Real labs. One-time price.</strong><br>
+      The Security+ study app built for people who actually want to pass.
+    </div>
+    <div class="pills">
+      <div class="pill pill-cyan">120 QUESTIONS</div>
+      <div class="pill pill-green">FULLY OFFLINE</div>
+      <div class="pill pill-purple">PERFORMANCE LABS</div>
+      <div class="pill pill-orange">NO SUBSCRIPTION</div>
+    </div>
+  </div>
+
+  <div class="right">
+    <div class="mock-card">
+      <div class="mock-header">// THREATS &amp; ATTACKS · Q 4 / 20</div>
+      <div class="mock-question">An attacker sends repeated MFA push notifications until the victim approves one out of frustration. What is this attack?</div>
+      <div class="mock-options">
+        <div class="mock-opt"><span class="opt-letter">A</span> Credential Stuffing</div>
+        <div class="mock-opt correct"><span class="opt-letter">B</span> MFA Fatigue</div>
+        <div class="mock-opt"><span class="opt-letter">C</span> Pass-the-Hash</div>
+        <div class="mock-opt"><span class="opt-letter">D</span> Replay Attack</div>
+      </div>
+    </div>
+
+    <div class="mock-stats">
+      <div class="stat-card">
+        <div class="stat-val" style="color:#00ff88">87%</div>
+        <div class="stat-lbl">SCORE</div>
+      </div>
+      <div class="stat-card">
+        <div class="stat-val" style="color:#00d4ff">120</div>
+        <div class="stat-lbl">QUESTIONS</div>
+      </div>
+      <div class="stat-card">
+        <div class="stat-val" style="color:#ff8800">5</div>
+        <div class="stat-lbl">DOMAINS</div>
+      </div>
+    </div>
+  </div>
+
+</div>
+
+</body>
+</html>
