@@ -1026,7 +1026,7 @@
     <div class="nav-icon">📡</div>
     <div class="nav-label">LESSONS</div>
   </div>
-  <div class="nav-item" id="nav-tidbits" onclick="navTo('tidbitScreen', 'nav-tidbits')">
+  <div class="nav-item" id="nav-tidbits" onclick="navTo('tidbitScreen', 'nav-tidbits'); showTidbits();">
     <div class="nav-icon">⚡</div>
     <div class="nav-label">INTEL</div>
   </div>
@@ -1205,7 +1205,10 @@ Tests the running application from outside like an attacker. No source code need
 <strong>IAST (Interactive AST)</strong><br>
 Agents embedded inside the running application monitor it during testing. Best coverage, most complex to deploy.<br><br>
 <div class="highlight">SDLC placement: SAST early (coding) → IAST during QA → DAST late (staging). Security+ expects you to know which finds what.</div>`
-  },
+  }
+];
+
+const QUESTIONS = [
   {
     id: 1,
     domain: "THREATS & ATTACKS",
