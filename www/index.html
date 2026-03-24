@@ -572,7 +572,9 @@
     padding: 24px 20px 40px;
     max-height: 80vh;
     overflow-y: auto;
-    animation: slideUp 0.3s ease;
+    animation: slideUp 0.3s cubic-bezier(0.25, 0.46, 0.45, 0.94);
+    will-change: transform;
+    user-select: none;
   }
 
   @keyframes slideUp { from { transform: translateY(100%); } to { transform: translateY(0); } }
@@ -583,7 +585,10 @@
     background: var(--border-bright);
     border-radius: 2px;
     margin: 0 auto 20px;
+    cursor: grab;
+    transition: background 0.2s;
   }
+  .modal-pill:active { cursor: grabbing; background: var(--accent-cyan); }
 
   .modal-category {
     font-family: 'Share Tech Mono', monospace;
@@ -907,19 +912,27 @@
         <button class="back-btn" onclick="showScreen('homeScreen')">← BACK</button>
       </div>
 
-      <div class="quiz-mode-card" onclick="startQuiz('full')">
-        <div class="quiz-mode-icon">📋</div>
+      <div class="quiz-mode-card" onclick="startQuiz('fast')">
+        <div class="quiz-mode-icon">⚡</div>
         <div>
-          <div class="quiz-mode-title">FULL EXAM — 30 QUESTIONS</div>
-          <div class="quiz-mode-desc">Simulates real SY0-701 exam. Timed. Mixed domains. Performance tracked.</div>
+          <div class="quiz-mode-title">FAST EXAM — 20 QUESTIONS</div>
+          <div class="quiz-mode-desc">Quick mixed-domain session. Timed. Great for daily practice.</div>
         </div>
       </div>
 
-      <div class="quiz-mode-card" onclick="startQuiz('domain')">
+      <div class="quiz-mode-card" onclick="startQuiz('half')">
+        <div class="quiz-mode-icon">📋</div>
+        <div>
+          <div class="quiz-mode-title">HALF EXAM — 45 QUESTIONS</div>
+          <div class="quiz-mode-desc">Half the real exam. Timed. Full domain coverage. Performance tracked.</div>
+        </div>
+      </div>
+
+      <div class="quiz-mode-card" onclick="showDomainPicker()">
         <div class="quiz-mode-icon">🎯</div>
         <div>
           <div class="quiz-mode-title">DOMAIN DRILL — 10 QUESTIONS</div>
-          <div class="quiz-mode-desc">Focus on one domain. Great for targeting weak spots.</div>
+          <div class="quiz-mode-desc">Pick one domain and drill it hard. Closes weak spots fast.</div>
         </div>
       </div>
 
@@ -927,8 +940,38 @@
         <div class="quiz-mode-icon">🔁</div>
         <div>
           <div class="quiz-mode-title">MISSED QUESTIONS</div>
-          <div class="quiz-mode-desc">Repeat only the questions you got wrong. Closes gaps fast.</div>
+          <div class="quiz-mode-desc">Every question you got wrong. Full review until you nail them.</div>
         </div>
+      </div>
+    </div>
+  </div>
+
+  <!-- DOMAIN PICKER SCREEN -->
+  <div class="screen" id="domainPickScreen">
+    <div class="quiz-mode-select">
+      <div class="section-header" style="padding: 4px 0 20px;">
+        <button class="back-btn" onclick="showScreen('quizModeScreen')">← BACK</button>
+        <div class="section-title" style="font-size:13px">SELECT DOMAIN</div>
+      </div>
+      <div class="quiz-mode-card" onclick="startDomainDrill('THREATS & ATTACKS')" style="border-color:#ff335540">
+        <div class="quiz-mode-icon">💀</div>
+        <div><div class="quiz-mode-title" style="color:#ff3355">THREATS &amp; ATTACKS</div><div class="quiz-mode-desc">Malware, social engineering, network attacks, vuln types</div></div>
+      </div>
+      <div class="quiz-mode-card" onclick="startDomainDrill('IMPLEMENTATION')" style="border-color:#00d4ff40">
+        <div class="quiz-mode-icon">🔧</div>
+        <div><div class="quiz-mode-title" style="color:#00d4ff">IMPLEMENTATION</div><div class="quiz-mode-desc">Crypto, PKI, protocols, secure config, identity & access</div></div>
+      </div>
+      <div class="quiz-mode-card" onclick="startDomainDrill('ARCHITECTURE')" style="border-color:#8855ff40">
+        <div class="quiz-mode-icon">🏗️</div>
+        <div><div class="quiz-mode-title" style="color:#8855ff">ARCHITECTURE</div><div class="quiz-mode-desc">Network design, cloud, virtualization, zero trust</div></div>
+      </div>
+      <div class="quiz-mode-card" onclick="startDomainDrill('OPERATIONS')" style="border-color:#ff880040">
+        <div class="quiz-mode-icon">🛡️</div>
+        <div><div class="quiz-mode-title" style="color:#ff8800">OPERATIONS &amp; IR</div><div class="quiz-mode-desc">Incident response, forensics, monitoring, threat intel</div></div>
+      </div>
+      <div class="quiz-mode-card" onclick="startDomainDrill('GOVERNANCE')" style="border-color:#00ff8840">
+        <div class="quiz-mode-icon">📜</div>
+        <div><div class="quiz-mode-title" style="color:#00ff88">GOVERNANCE &amp; COMPLIANCE</div><div class="quiz-mode-desc">Risk, frameworks, policies, regulations, privacy</div></div>
       </div>
     </div>
   </div>
@@ -1859,9 +1902,90 @@ function showTidbit() {
 
 function closeTidbitModal(e) {
   if (e.target === document.getElementById('tidbitModal')) {
-    document.getElementById('tidbitModal').classList.remove('show');
+    dismissSheet();
   }
 }
+
+function dismissSheet() {
+  const overlay = document.getElementById('tidbitModal');
+  const sheet = overlay.querySelector('.modal-sheet');
+  sheet.style.transition = 'transform 0.3s cubic-bezier(0.25, 0.46, 0.45, 0.94)';
+  sheet.style.transform = 'translateY(105%)';
+  overlay.style.transition = 'opacity 0.3s ease';
+  overlay.style.opacity = '0';
+  setTimeout(() => {
+    overlay.classList.remove('show');
+    overlay.style.opacity = '';
+    overlay.style.transition = '';
+    sheet.style.transform = '';
+    sheet.style.transition = '';
+  }, 300);
+}
+
+// ============================================================
+// BOTTOM SHEET DRAG
+// ============================================================
+(function() {
+  let startY = 0, lastY = 0, dragging = false, sheet = null, overlay = null;
+
+  function dragStart(y) {
+    overlay = document.getElementById('tidbitModal');
+    sheet = overlay.querySelector('.modal-sheet');
+    startY = y;
+    lastY = 0;
+    dragging = true;
+    sheet.style.transition = 'none';
+    overlay.style.transition = 'none';
+  }
+
+  function dragMove(y) {
+    if (!dragging) return;
+    lastY = y - startY;
+    // Allow full downward travel; rubber-band upward (max 24px up with resistance)
+    const dy = lastY < 0
+      ? lastY * 0.15
+      : lastY;
+    sheet.style.transform = `translateY(${dy}px)`;
+    // Fade backdrop as sheet slides down
+    const progress = Math.max(0, Math.min(1, lastY / 300));
+    overlay.style.background = `rgba(0,0,0,${0.85 - progress * 0.6})`;
+  }
+
+  function dragEnd() {
+    if (!dragging) return;
+    dragging = false;
+    if (lastY > 130) {
+      dismissSheet();
+    } else {
+      sheet.style.transition = 'transform 0.35s cubic-bezier(0.25, 0.46, 0.45, 0.94)';
+      sheet.style.transform = 'translateY(0)';
+      overlay.style.background = '';
+      setTimeout(() => { sheet.style.transition = ''; }, 350);
+    }
+  }
+
+  // Touch
+  document.addEventListener('touchstart', e => {
+    if (e.target.closest('#tidbitModal .modal-pill')) {
+      dragStart(e.touches[0].clientY);
+      e.preventDefault();
+    }
+  }, { passive: false });
+
+  document.addEventListener('touchmove', e => {
+    if (dragging) { dragMove(e.touches[0].clientY); e.preventDefault(); }
+  }, { passive: false });
+
+  document.addEventListener('touchend', () => { if (dragging) dragEnd(); });
+  document.addEventListener('touchcancel', () => { if (dragging) dragEnd(); });
+
+  // Mouse
+  document.addEventListener('mousedown', e => {
+    if (e.target.closest('#tidbitModal .modal-pill')) dragStart(e.clientY);
+  });
+  document.addEventListener('mousemove', e => { if (dragging) dragMove(e.clientY); });
+  document.addEventListener('mouseup', () => { if (dragging) dragEnd(); });
+}());
 
 function showTidbits() {
   showScreen('tidbitScreen');
@@ -1897,6 +2021,24 @@ function startQuickFire() {
   startQuiz('quick');
 }
 
+function showDomainPicker() {
+  showScreen('domainPickScreen');
+}
+
+function startDomainDrill(domain) {
+  const pool = QUESTIONS.filter(q => q.domain === domain);
+  quiz.mode = 'domain';
+  quiz.current = 0;
+  quiz.correct = 0;
+  quiz.answered = false;
+  quiz.startTime = Date.now();
+  quiz.questions = shuffle([...pool]).slice(0, 10);
+  quiz.timeLeft = 60 * 15;
+  showScreen('quizScreen');
+  renderQuestion();
+  startTimer();
+}
+
 function startQuiz(mode) {
   quiz.mode = mode;
   quiz.current = 0;
@@ -1904,13 +2046,13 @@ function startQuiz(mode) {
   quiz.answered = false;
   quiz.startTime = Date.now();
 
-  if (mode === 'full') {
+  if (mode === 'fast') {
     quiz.questions = shuffle([...QUESTIONS]).slice(0, 20);
-    quiz.timeLeft = 60 * 45; // 45 min
+    quiz.timeLeft = 60 * 30;
+  } else if (mode === 'half') {
+    quiz.questions = shuffle([...QUESTIONS]).slice(0, 45);
+    quiz.timeLeft = 60 * 60;
   } else if (mode === 'quick') {
-    quiz.questions = shuffle([...QUESTIONS]).slice(0, 10);
-    quiz.timeLeft = 60 * 15;
-  } else if (mode === 'domain') {
     quiz.questions = shuffle([...QUESTIONS]).slice(0, 10);
     quiz.timeLeft = 60 * 15;
   } else if (mode === 'missed') {
