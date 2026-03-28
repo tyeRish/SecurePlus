@@ -443,6 +443,36 @@
       <div class="lab-difficulty diff-easy" style="background:rgba(138,85,255,0.15);color:#8855ff;border-color:rgba(138,85,255,0.3)">DEMO</div>
     </div>
 
+    <div class="lab-card" onclick="startLab('acronyms')">
+      <div class="lab-icon">🔤</div>
+      <div class="lab-info">
+        <div class="lab-title">ACRONYM DISAMBIGUATION DRILL</div>
+        <div class="lab-desc">Given a description, identify the correct metric or acronym. RTO, RPO, MTD, MTBF, MTTR, SLE, ALE — the exam hits these back-to-back in scenarios.</div>
+        <div class="lab-meta">SCENARIO DRILL · 15 ITEMS · GOVERNANCE</div>
+      </div>
+      <div class="lab-difficulty diff-medium">MEDIUM</div>
+    </div>
+
+    <div class="lab-card" onclick="startLab('riskcalc')">
+      <div class="lab-icon">🧮</div>
+      <div class="lab-info">
+        <div class="lab-title">RISK CALCULATION LAB</div>
+        <div class="lab-desc">Given AV, EF, and ARO — calculate SLE and ALE. The math is simple once you've done it 5 times. People panic because they haven't practiced.</div>
+        <div class="lab-meta">CALCULATION · 6 SCENARIOS · GOVERNANCE</div>
+      </div>
+      <div class="lab-difficulty diff-medium">MEDIUM</div>
+    </div>
+
+    <div class="lab-card" onclick="startLab('pentest')">
+      <div class="lab-icon">🕵️</div>
+      <div class="lab-info">
+        <div class="lab-title">PENTEST METHODOLOGY LAB</div>
+        <div class="lab-desc">Three scenarios — Black Box, Grey Box, and White Box. Choose the right testing approach, methodology, and tools for each engagement type.</div>
+        <div class="lab-meta">SCENARIO · 3 ENGAGEMENT TYPES · OPERATIONS</div>
+      </div>
+      <div class="lab-difficulty diff-hard">HARD</div>
+    </div>
+
   </div>
 
   <!-- LAB DETAIL VIEW -->
@@ -450,10 +480,44 @@
 
 </div>
 
+<!-- LABS PAYWALL OVERLAY -->
+<div id="labPaywallOverlay" onclick="if(event.target===this)this.style.display='none'" style="display:none;position:fixed;inset:0;background:rgba(0,0,0,0.85);z-index:9000;align-items:center;justify-content:center;padding:24px">
+  <div style="background:var(--bg-card,#1a1f2e);border:1px solid rgba(0,212,255,0.2);border-radius:16px;padding:28px;max-width:360px;width:100%;text-align:center">
+    <div style="font-size:32px;margin-bottom:12px">🔒</div>
+    <div style="font-family:'Orbitron',monospace;font-size:13px;color:#00d4ff;letter-spacing:2px;margin-bottom:8px">PREMIUM LAB</div>
+    <div id="labPaywallName" style="font-size:17px;font-weight:700;color:#fff;margin-bottom:12px"></div>
+    <div style="font-size:13px;color:#aaa;margin-bottom:20px;line-height:1.5">Unlock all labs, domain drills, the half exam, and <strong>160+ questions</strong> with a one-time $4.99 purchase.</div>
+    <button onclick="labsPurchasePremium()" style="width:100%;background:linear-gradient(135deg,#00d4ff,#8855ff);border:none;border-radius:10px;padding:14px;font-family:'Orbitron',monospace;font-size:13px;color:#000;font-weight:700;letter-spacing:1px;cursor:pointer;margin-bottom:10px">UNLOCK FOR $4.99</button>
+    <button onclick="document.getElementById('labPaywallOverlay').style.display='none'" style="width:100%;background:transparent;border:1px solid rgba(255,255,255,0.1);border-radius:10px;padding:12px;font-family:'Share Tech Mono',monospace;font-size:12px;color:#888;cursor:pointer">MAYBE LATER</button>
+  </div>
+</div>
+
 <script>
 
 let currentLab = null;
 let labState = {};
+
+// Premium check — shared with index.html via localStorage
+// BETA_MODE must match the value in index.html
+const LABS_BETA_MODE = true; // ← flip to false at launch (keep in sync with index.html)
+const PREMIUM_LABS = ['ports','crypto','firewall','incident','analysis','cloud','iam','logs','soc','packets','acronyms','riskcalc','pentest'];
+
+function labsIsPremium() {
+  if (LABS_BETA_MODE) return true;
+  try { return localStorage.getItem('secplusPremium') === 'true'; } catch(e) { return false; }
+}
+
+function showLabPaywall(labTitle) {
+  const el = document.getElementById('labPaywallOverlay');
+  document.getElementById('labPaywallName').textContent = labTitle || 'This lab';
+  el.style.display = 'flex';
+}
+
+function labsPurchasePremium() {
+  // TODO: call Capacitor IAP plugin here — on success call:
+  // localStorage.setItem('secplusPremium','true'); location.reload();
+  alert('IAP integration coming — see labsPurchasePremium() in source.');
+}
 
 function goBack() {
   if (document.getElementById('labSelectView').style.display === 'none') {
@@ -466,6 +530,17 @@ function goBack() {
 }
 
 function startLab(id) {
+  if (PREMIUM_LABS.includes(id) && !labsIsPremium()) {
+    const titles = {
+      ports: 'Port Number Recall', crypto: 'Crypto Tool Matching', firewall: 'Firewall Rule Builder',
+      incident: 'IR Sequencing', analysis: 'Threat Scenario Analysis', cloud: 'Cloud Responsibility Matrix',
+      iam: 'IAM Protocol Matching', logs: 'Log Analysis Lab', soc: 'SOC Triage Simulation',
+      packets: 'Packet Capture Analysis', acronyms: 'Acronym Disambiguation Drill',
+      riskcalc: 'Risk Calculation Lab', pentest: 'Pentest Methodology Lab'
+    };
+    showLabPaywall(titles[id] || id);
+    return;
+  }
   currentLab = id;
   labState = { score: 0, total: 0, answers: [] };
   document.getElementById('labSelectView').style.display = 'none';
@@ -482,7 +557,10 @@ function startLab(id) {
     iam: buildIamLab,
     logs: buildLogsLab,
     soc: buildSocLab,
-    packets: buildPacketsLab
+    packets: buildPacketsLab,
+    acronyms: buildAcronymsLab,
+    riskcalc: buildRiskCalcLab,
+    pentest: buildPentestLab
   };
 
   builders[id]();
@@ -523,10 +601,11 @@ function buildAttacksLab() {
 }
 
 // ============================================================
-// LAB 2: PORTS (FILL IN)
+// LAB 2: PORTS (FILL IN — STANDARD + EXPERT MODE)
 // ============================================================
-function buildPortsLab() {
-  const ports = [
+function buildPortsLab(mode) {
+  mode = mode || 'standard';
+  const allPorts = [
     { protocol: 'FTP Data', port: '20', hint: '2_' },
     { protocol: 'FTP Control', port: '21', hint: '2_' },
     { protocol: 'SSH / SFTP', port: '22', hint: '2_' },
@@ -563,19 +642,35 @@ function buildPortsLab() {
     { protocol: 'Syslog TLS', port: '6514', hint: '6___' },
   ];
 
+  // Expert mode: shuffle order and remove hints
+  const ports = mode === 'expert'
+    ? [...allPorts].sort(() => Math.random() - 0.5)
+    : allPorts;
+
+  const isExpert = mode === 'expert';
+  const modeLabel = isExpert ? 'EXPERT MODE — no hints, randomised order' : 'STANDARD MODE — hints show digit count';
+  const modeDesc = isExpert
+    ? 'No digit hints. Ports are in random order. This is how the exam will feel.'
+    : 'Enter the correct port number for each protocol. These appear on nearly every Security+ exam.';
+
   let html = `
     <div class="lab-header">
       <div class="lab-header-title">🔌 PORT NUMBER RECALL</div>
-      <div class="lab-header-desc">Enter the correct port number for each protocol. These appear on nearly every Security+ exam.</div>
+      <div class="lab-header-desc">${modeDesc}</div>
     </div>
-    <div class="drag-instruction">// ENTER PORT NUMBERS — hints show digit count</div>
+    <div style="display:flex;gap:10px;margin-bottom:16px">
+      <button class="action-btn${!isExpert ? ' green' : ' secondary'}" style="flex:1;font-size:12px" onclick="buildPortsLab('standard')">STANDARD</button>
+      <button class="action-btn${isExpert ? ' green' : ' secondary'}" style="flex:1;font-size:12px" onclick="buildPortsLab('expert')">EXPERT</button>
+    </div>
+    <div class="drag-instruction">// ${modeLabel}</div>
     <div class="port-grid" id="portGrid">`;
 
   ports.forEach((p, i) => {
+    const placeholder = isExpert ? '?' : p.hint;
     html += `
       <div class="port-row">
         <div class="port-protocol">${p.protocol}</div>
-        <input class="port-input" id="port_${i}" type="number" placeholder="${p.hint}" data-answer="${p.port}" inputmode="numeric">
+        <input class="port-input" id="port_${i}" type="number" placeholder="${placeholder}" data-answer="${p.port}" inputmode="numeric">
         <div class="port-hint" id="portHint_${i}"></div>
       </div>`;
   });
@@ -584,7 +679,7 @@ function buildPortsLab() {
     <br>
     <button class="action-btn green" onclick="checkPorts()">CHECK ANSWERS</button>
     <div class="feedback-box" id="portFeedback"></div>
-    <button class="action-btn secondary" onclick="startLab('ports')" id="portRetry" style="display:none">RETRY</button>`;
+    <button class="action-btn secondary" onclick="buildPortsLab('${mode}')" id="portRetry" style="display:none">RETRY</button>`;
 
   document.getElementById('labDetailView').innerHTML = html;
 }
@@ -615,7 +710,7 @@ function checkPorts() {
   fb.className = 'feedback-box show ' + (pct >= 80 ? 'pass' : 'fail');
   fb.innerHTML = `
     <div class="feedback-title">${pct >= 80 ? '✓ SOLID' : '✗ NEEDS DRILLING'}</div>
-    <div class="feedback-text">${correct}/${inputs.length} correct (${pct}%). 
+    <div class="feedback-text">${correct}/${inputs.length} correct (${pct}%).
     ${pct < 80 ? 'Wrong answers shown in red — correct ports displayed. Repeat until 100%.' : 'Port knowledge is sharp. Wrong ones are shown for review.'}</div>`;
 
   document.getElementById('portRetry').style.display = 'block';
@@ -1715,6 +1810,392 @@ Result: Legitimate users cannot establish connections`,
   };
 
   renderPacket(0);
+}
+
+// ============================================================
+// LAB: ACRONYM DISAMBIGUATION DRILL
+// ============================================================
+function buildAcronymsLab() {
+  const questions = [
+    {
+      description: "The maximum amount of time a system can be offline before the business faces irreversible damage.",
+      options: ["RTO", "RPO", "MTD", "MTBF"],
+      correct: 2,
+      explanation: "<strong>MTD (Maximum Tolerable Downtime)</strong> — the absolute ceiling. The RTO must be set LESS than the MTD to maintain a safety margin."
+    },
+    {
+      description: "The maximum amount of data loss, measured in time, that a business can accept after a disaster.",
+      options: ["RTO", "RPO", "MTD", "MTTR"],
+      correct: 1,
+      explanation: "<strong>RPO (Recovery Point Objective)</strong> — measures data loss tolerance. An RPO of 1 hour means backups or replication must occur at least every hour."
+    },
+    {
+      description: "The target time within which a system must be restored and operational after a failure.",
+      options: ["RTO", "RPO", "MTD", "MTBF"],
+      correct: 0,
+      explanation: "<strong>RTO (Recovery Time Objective)</strong> — measures downtime tolerance. Drives the recovery strategy choice: hot/warm/cold site, backup restoration speed."
+    },
+    {
+      description: "The average time a system operates between failures. A higher value means greater reliability.",
+      options: ["MTTR", "MTBF", "RTO", "MTD"],
+      correct: 1,
+      explanation: "<strong>MTBF (Mean Time Between Failures)</strong> — reliability metric. Used for hardware procurement decisions and maintenance scheduling."
+    },
+    {
+      description: "The average time required to restore a system after it has failed.",
+      options: ["MTBF", "RTO", "MTTR", "RPO"],
+      correct: 2,
+      explanation: "<strong>MTTR (Mean Time to Repair)</strong> — recovery speed metric. Availability = MTBF ÷ (MTBF + MTTR). High MTTR = slow recovery = low availability."
+    },
+    {
+      description: "The expected financial loss from a single occurrence of a specific threat event.",
+      options: ["ALE", "SLE", "ARO", "AV"],
+      correct: 1,
+      explanation: "<strong>SLE (Single Loss Expectancy) = AV × EF</strong>. It quantifies the loss from one incident before considering how often it occurs annually."
+    },
+    {
+      description: "The expected annual financial loss from a specific threat, accounting for how often it occurs.",
+      options: ["SLE", "EF", "ALE", "ARO"],
+      correct: 2,
+      explanation: "<strong>ALE (Annualized Loss Expectancy) = SLE × ARO</strong>. This is the number used to justify security spending — if ALE > control cost, the control is worth it."
+    },
+    {
+      description: "The estimated number of times a specific threat event is expected to occur in one year.",
+      options: ["EF", "ARO", "AV", "SLE"],
+      correct: 1,
+      explanation: "<strong>ARO (Annualized Rate of Occurrence)</strong> — frequency estimate per year. ARO of 0.5 means once every two years. ARO of 4 means four times per year."
+    },
+    {
+      description: "The percentage of an asset's value that would be destroyed in a single threat event.",
+      options: ["ARO", "AV", "EF", "SLE"],
+      correct: 2,
+      explanation: "<strong>EF (Exposure Factor)</strong> — a decimal between 0 and 1.0 representing partial or total destruction. EF of 0.6 = 60% of the asset destroyed per incident."
+    },
+    {
+      description: "Systems are restored to a functional state. Production traffic resumes. This phase follows eradication in the IR lifecycle.",
+      options: ["Containment", "Recovery", "Lessons Learned", "Identification"],
+      correct: 1,
+      explanation: "<strong>Recovery (PICERL)</strong> — systems restored and returned to production. Happens after eradication (removal of all threat artifacts). Monitor closely post-recovery for signs of reinfection."
+    },
+    {
+      description: "A post-incident review that documents what happened, why controls failed, and what should change.",
+      options: ["Eradication", "Recovery", "Lessons Learned", "Containment"],
+      correct: 2,
+      explanation: "<strong>Lessons Learned</strong> — the final PICERL phase. Often skipped under time pressure but most valuable for long-term improvement. Produces updated policies, playbooks, and control recommendations."
+    },
+    {
+      description: "The control objective of ensuring information is accurate, unmodified, and reliable.",
+      options: ["Confidentiality", "Availability", "Integrity", "Non-repudiation"],
+      correct: 2,
+      explanation: "<strong>Integrity</strong> — data has not been tampered with or accidentally modified. Controls: hashing (SHA-256), digital signatures, checksums, version control. The 'I' in CIA."
+    },
+    {
+      description: "An organization purchases cyber liability insurance for a risk it cannot cost-effectively mitigate internally.",
+      options: ["Risk Avoidance", "Risk Acceptance", "Risk Transfer", "Risk Mitigation"],
+      correct: 2,
+      explanation: "<strong>Risk Transfer</strong> — shifting financial impact to a third party via insurance or contractual liability. Does not eliminate the technical risk, only transfers the financial consequence."
+    },
+    {
+      description: "An organization decides to stop offering a cloud service because the regulatory and security risks outweigh the business benefit.",
+      options: ["Risk Transfer", "Risk Mitigation", "Risk Acceptance", "Risk Avoidance"],
+      correct: 3,
+      explanation: "<strong>Risk Avoidance</strong> — eliminating the risk by stopping the activity that creates it. The most complete risk treatment but often not practical when the activity generates value."
+    },
+    {
+      description: "After reviewing a low-probability, low-impact risk, leadership signs off and documents it in the risk register with no additional controls.",
+      options: ["Risk Transfer", "Risk Avoidance", "Risk Mitigation", "Risk Acceptance"],
+      correct: 3,
+      explanation: "<strong>Risk Acceptance</strong> — a deliberate, documented decision to tolerate a residual risk. Must be approved by the appropriate risk owner. Not the same as ignoring risk — it's a conscious, signed-off choice."
+    }
+  ];
+
+  labState.acroAnswered = new Array(questions.length).fill(false);
+  labState.acroCorrect = 0;
+
+  let html = `
+    <div class="lab-header">
+      <div class="lab-header-title">🔤 ACRONYM DISAMBIGUATION DRILL</div>
+      <div class="lab-header-desc">Read the description. Select the acronym it defines. No choices contain the acronym name — you must recognize it from the description alone.</div>
+      <div class="lab-score-bar">
+        <div class="lab-score-label">SCORE:</div>
+        <div class="lab-score-val" id="acroScore">0 / ${questions.length}</div>
+      </div>
+    </div>`;
+
+  questions.forEach((q, i) => {
+    const letters = ['A','B','C','D'];
+    html += `
+      <div style="margin-bottom:24px;padding-bottom:24px;border-bottom:1px solid var(--border)">
+        <div class="scenario-box" style="font-size:14px;font-style:italic">${q.description}</div>
+        <div class="answer-options" id="acroOpts_${i}">`;
+    q.options.forEach((opt, j) => {
+      html += `
+          <button class="answer-opt" id="acroOpt_${i}_${j}" onclick="selectAcronym(${i},${j},${q.correct})">
+            <span class="answer-letter">${letters[j]}</span>
+            <span class="answer-text">${opt}</span>
+          </button>`;
+    });
+    html += `</div>
+        <div class="feedback-box" id="acroFb_${i}">
+          <div class="feedback-title" id="acroFbTitle_${i}"></div>
+          <div class="feedback-text" id="acroFbText_${i}"></div>
+        </div>
+      </div>`;
+  });
+
+  labState.acroQuestions = questions;
+  document.getElementById('labDetailView').innerHTML = html;
+}
+
+function selectAcronym(qIdx, optIdx, correct) {
+  if (labState.acroAnswered[qIdx]) return;
+  labState.acroAnswered[qIdx] = true;
+  const letters = ['A','B','C','D'];
+  document.querySelectorAll(`#acroOpts_${qIdx} .answer-opt`).forEach((btn, j) => {
+    btn.onclick = null;
+    if (j === correct) btn.classList.add('correct');
+    if (j === optIdx && optIdx !== correct) btn.classList.add('incorrect');
+  });
+  const isCorrect = optIdx === correct;
+  if (isCorrect) labState.acroCorrect++;
+  const fb = document.getElementById(`acroFb_${qIdx}`);
+  fb.className = 'feedback-box show ' + (isCorrect ? 'pass' : 'fail');
+  document.getElementById(`acroFbTitle_${qIdx}`).textContent = isCorrect ? '✓ CORRECT' : `✗ INCORRECT — answer: ${labState.acroQuestions[qIdx].options[correct]}`;
+  document.getElementById(`acroFbText_${qIdx}`).innerHTML = labState.acroQuestions[qIdx].explanation;
+  document.getElementById('acroScore').textContent = `${labState.acroCorrect} / ${labState.acroQuestions.length}`;
+}
+
+// ============================================================
+// LAB: RISK CALCULATION LAB
+// ============================================================
+function buildRiskCalcLab() {
+  const scenarios = [
+    { av: 200000, ef: 0.5, aro: 1, sle: 100000, ale: 100000,
+      context: "A file server holds $200,000 worth of engineering IP. A ransomware attack is estimated to destroy 50% of the data. The organization estimates ransomware hits them once per year." },
+    { av: 500000, ef: 0.6, aro: 2, sle: 300000, ale: 600000,
+      context: "A customer database is valued at $500,000. A breach would expose 60% of the data on average. Threat intelligence suggests this type of breach occurs twice per year in the industry." },
+    { av: 1000000, ef: 0.25, aro: 0.5, sle: 250000, ale: 125000,
+      context: "A production e-commerce server is worth $1,000,000. A DDoS attack would disrupt 25% of business operations. Such attacks are estimated at once every two years (ARO = 0.5)." },
+    { av: 80000, ef: 1.0, aro: 3, sle: 80000, ale: 240000,
+      context: "A laptop containing sensitive research data is valued at $80,000. If stolen, 100% of the data is considered lost. Laptops are reported stolen approximately 3 times per year across the organization." },
+    { av: 300000, ef: 0.4, aro: 4, sle: 120000, ale: 480000,
+      context: "A cloud application is valued at $300,000. A credential stuffing attack would compromise 40% of accounts on average. These attacks are expected 4 times per year based on past incidents." },
+    { av: 750000, ef: 0.8, aro: 0.25, sle: 600000, ale: 150000,
+      context: "Critical infrastructure equipment is valued at $750,000. A physical intrusion would destroy 80% of it. Physical breaches of this facility are estimated at once every four years (ARO = 0.25)." }
+  ];
+
+  labState.rcAnswered = new Array(scenarios.length).fill(false);
+  labState.rcCorrect = 0;
+
+  let html = `
+    <div class="lab-header">
+      <div class="lab-header-title">🧮 RISK CALCULATION LAB</div>
+      <div class="lab-header-desc">Calculate SLE and ALE for each scenario. Use: <strong>SLE = AV × EF</strong> and <strong>ALE = SLE × ARO</strong>.</div>
+      <div style="background:rgba(0,212,255,0.08);border:1px solid rgba(0,212,255,0.2);border-radius:8px;padding:12px;margin-top:12px;font-size:12px;color:var(--text-secondary)">
+        <strong style="color:var(--accent-cyan)">FORMULAS</strong><br>
+        AV = Asset Value · EF = Exposure Factor (%) · ARO = Annual Rate of Occurrence<br>
+        <strong>SLE = AV × EF</strong> (single incident loss)<br>
+        <strong>ALE = SLE × ARO</strong> (annual expected loss)
+      </div>
+    </div>`;
+
+  scenarios.forEach((s, i) => {
+    html += `
+      <div style="margin-bottom:28px;padding-bottom:28px;border-bottom:1px solid var(--border)">
+        <div style="font-family:'Share Tech Mono',monospace;font-size:10px;color:var(--accent-purple);letter-spacing:2px;margin-bottom:10px">SCENARIO ${i+1}</div>
+        <div class="scenario-box">${s.context}</div>
+        <div style="display:grid;grid-template-columns:1fr 1fr 1fr;gap:10px;margin:12px 0">
+          <div style="background:var(--bg-elevated);border-radius:8px;padding:10px;text-align:center">
+            <div style="font-size:10px;color:var(--text-dim);margin-bottom:4px">ASSET VALUE</div>
+            <div style="font-size:16px;color:var(--accent-cyan);font-weight:700">$${s.av.toLocaleString()}</div>
+          </div>
+          <div style="background:var(--bg-elevated);border-radius:8px;padding:10px;text-align:center">
+            <div style="font-size:10px;color:var(--text-dim);margin-bottom:4px">EXPOSURE FACTOR</div>
+            <div style="font-size:16px;color:var(--accent-cyan);font-weight:700">${(s.ef*100)}%</div>
+          </div>
+          <div style="background:var(--bg-elevated);border-radius:8px;padding:10px;text-align:center">
+            <div style="font-size:10px;color:var(--text-dim);margin-bottom:4px">ARO</div>
+            <div style="font-size:16px;color:var(--accent-cyan);font-weight:700">${s.aro}×/yr</div>
+          </div>
+        </div>
+        <div style="display:grid;grid-template-columns:1fr 1fr;gap:10px;margin-bottom:12px">
+          <div>
+            <div style="font-size:11px;color:var(--text-dim);margin-bottom:6px">SLE = AV × EF</div>
+            <div style="display:flex;align-items:center;gap:8px">
+              <span style="font-size:14px;color:var(--text-secondary)">$</span>
+              <input type="number" id="rc_sle_${i}" placeholder="calculate..." style="flex:1;background:var(--bg-elevated);border:1px solid var(--border);border-radius:6px;padding:10px;color:var(--text-primary);font-size:14px;font-family:inherit" inputmode="numeric">
+            </div>
+          </div>
+          <div>
+            <div style="font-size:11px;color:var(--text-dim);margin-bottom:6px">ALE = SLE × ARO</div>
+            <div style="display:flex;align-items:center;gap:8px">
+              <span style="font-size:14px;color:var(--text-secondary)">$</span>
+              <input type="number" id="rc_ale_${i}" placeholder="calculate..." style="flex:1;background:var(--bg-elevated);border:1px solid var(--border);border-radius:6px;padding:10px;color:var(--text-primary);font-size:14px;font-family:inherit" inputmode="numeric">
+            </div>
+          </div>
+        </div>
+        <button class="action-btn green" onclick="checkRiskCalc(${i},${s.sle},${s.ale})">CHECK</button>
+        <div class="feedback-box" id="rcFb_${i}"></div>
+      </div>`;
+  });
+
+  document.getElementById('labDetailView').innerHTML = html;
+}
+
+function checkRiskCalc(i, correctSLE, correctALE) {
+  if (labState.rcAnswered[i]) return;
+  const sleInput = parseInt(document.getElementById(`rc_sle_${i}`).value) || 0;
+  const aleInput = parseInt(document.getElementById(`rc_ale_${i}`).value) || 0;
+  const sleOk = Math.abs(sleInput - correctSLE) <= 1;
+  const aleOk = Math.abs(aleInput - correctALE) <= 1;
+  const pass = sleOk && aleOk;
+  if (pass) { labState.rcAnswered[i] = true; labState.rcCorrect++; }
+  const fb = document.getElementById(`rcFb_${i}`);
+  fb.className = 'feedback-box show ' + (pass ? 'pass' : 'fail');
+  fb.innerHTML = `
+    <div class="feedback-title">${pass ? '✓ CORRECT' : '✗ NOT QUITE'}</div>
+    <div class="feedback-text">
+      SLE = $${correctSLE.toLocaleString()} ${sleOk ? '✓' : '✗ (yours: $' + sleInput.toLocaleString() + ')'}<br>
+      ALE = $${correctALE.toLocaleString()} ${aleOk ? '✓' : '✗ (yours: $' + aleInput.toLocaleString() + ')'}
+    </div>`;
+}
+
+// ============================================================
+// LAB: PENTEST METHODOLOGY (BLACK / GREY / WHITE BOX)
+// ============================================================
+function buildPentestLab() {
+  const engagements = [
+    {
+      type: "BLACK BOX",
+      color: "#ff3355",
+      badge: "EXTERNAL ATTACKER SIMULATION",
+      scenario: `A financial company hires a pentesting firm to assess their public-facing infrastructure. The testers are given only the company name and one IP range. They receive no credentials, no architecture diagrams, no source code, and no insider knowledge. They must discover everything independently.`,
+      questions: [
+        {
+          q: "Which phase comes FIRST in a black box engagement?",
+          options: ["Exploitation", "OSINT / Passive Reconnaissance", "Privilege Escalation", "Reporting"],
+          correct: 1,
+          exp: "<strong>OSINT and Passive Reconnaissance</strong> come first. With no provided information, the tester must discover assets, technology stacks, employee information, and entry points independently. Tools: Shodan, WHOIS, Google dorking, LinkedIn, Recon-ng, theHarvester."
+        },
+        {
+          q: "A black box tester finds an open port 3389. What is the MOST appropriate next step?",
+          options: ["Immediately brute-force credentials", "Document, verify the service, research known vulnerabilities, and attempt with default credentials within scope", "Skip it — RDP is always patched", "Report it as critical without testing"],
+          correct: 1,
+          exp: "Enumeration before exploitation: verify the service version, check for known CVEs, try default credentials. Jumping straight to brute force without scoping/enumeration is noisy and risks scope violation. Methodical approach: scan → enumerate → research → test."
+        }
+      ]
+    },
+    {
+      type: "GREY BOX",
+      color: "#ff8800",
+      badge: "AUTHENTICATED INSIDER SIMULATION",
+      scenario: `A healthcare company wants to test what a compromised employee account could access. The pentesting firm is given a standard user account (no admin privileges), the general network range, and a high-level description of the system types present. They are not given architecture diagrams, credentials beyond the test account, or source code.`,
+      questions: [
+        {
+          q: "Grey box testing MOST closely simulates which threat scenario?",
+          options: ["An unauthenticated external attacker", "A malicious insider or compromised user account", "A nation-state APT with full reconnaissance", "A physical intruder"],
+          correct: 1,
+          exp: "<strong>Malicious insider / compromised account</strong> — grey box provides the access level a real employee (or attacker who phished an employee) would have. More realistic than black box for internal threat modeling, more efficient than white box while maintaining real-world authenticity."
+        },
+        {
+          q: "With standard user access, the grey box tester discovers they can read HR database records. What vulnerability class is this?",
+          options: ["Privilege escalation", "Broken Access Control", "SQL Injection", "CSRF"],
+          correct: 1,
+          exp: "<strong>Broken Access Control</strong> (OWASP #1) — a standard user account should not have access to HR data. This is a horizontal privilege issue (accessing data outside your scope). The tester documents the finding with evidence: screenshots of unauthorized data access, the account used, and the access path."
+        }
+      ]
+    },
+    {
+      type: "WHITE BOX",
+      color: "#00ff88",
+      badge: "FULL KNOWLEDGE ASSESSMENT",
+      scenario: `A software company wants a thorough security review of a critical payment processing application before launch. They provide the pentesters with full source code, architecture diagrams, all credentials including admin, the CI/CD pipeline configuration, network topology, and developer documentation.`,
+      questions: [
+        {
+          q: "White box testing is MOST analogous to which security activity?",
+          options: ["Bug Bounty Program", "Code Review combined with penetration testing", "Red Team Exercise", "Vulnerability Scanning"],
+          correct: 1,
+          exp: "<strong>Code review + penetration testing</strong> — white box provides maximum coverage because the tester can read the source code, trace data flows, and identify logic flaws invisible to external testing. This is the most thorough (and most expensive) approach. Often used for high-stakes systems before launch or for compliance requirements."
+        },
+        {
+          q: "A white box tester reviews the source code and finds that the payment app concatenates user input directly into SQL queries rather than using parameterized queries. The external scan showed no vulnerability. What does this demonstrate?",
+          options: ["The external scan had a false positive", "White box testing finds logic flaws invisible to external testing, such as code-level injection vulnerabilities", "The SQL injection is unexploitable", "The tester should ignore code-level findings"],
+          correct: 1,
+          exp: "This is the key advantage of white box: <strong>code-level SQL injection</strong> may not be exploitable via automated external scanning (if inputs are filtered before reaching the query), but the underlying code is still dangerous and can be bypassed. White box finds architectural and logic flaws that DAST/external scanning misses."
+        }
+      ]
+    }
+  ];
+
+  labState.ptAnswered = {};
+  labState.ptCorrect = 0;
+  labState.ptTotal = engagements.reduce((sum, e) => sum + e.questions.length, 0);
+
+  let html = `
+    <div class="lab-header">
+      <div class="lab-header-title">🕵️ PENTEST METHODOLOGY LAB</div>
+      <div class="lab-header-desc">Three engagement types — Black Box, Grey Box, White Box. Read each scenario, understand the knowledge level provided, and answer the methodology questions.</div>
+      <div class="lab-score-bar">
+        <div class="lab-score-label">SCORE:</div>
+        <div class="lab-score-val" id="ptScore">0 / ${labState.ptTotal}</div>
+      </div>
+    </div>`;
+
+  engagements.forEach((eng, eIdx) => {
+    html += `
+      <div style="margin-bottom:28px;padding-bottom:28px;border-bottom:1px solid var(--border)">
+        <div style="display:flex;align-items:center;gap:10px;margin-bottom:12px">
+          <div style="background:${eng.color}22;border:1px solid ${eng.color}44;border-radius:6px;padding:6px 12px;font-family:'Share Tech Mono',monospace;font-size:11px;color:${eng.color};letter-spacing:2px">${eng.type}</div>
+          <div style="font-size:11px;color:var(--text-dim)">${eng.badge}</div>
+        </div>
+        <div class="scenario-box">${eng.scenario}</div>`;
+
+    eng.questions.forEach((q, qIdx) => {
+      const key = `${eIdx}_${qIdx}`;
+      const letters = ['A','B','C','D'];
+      html += `
+        <div style="margin-top:16px">
+          <div style="font-size:14px;font-weight:700;color:var(--text-primary);margin-bottom:10px">${q.q}</div>
+          <div class="answer-options" id="ptOpts_${key}">`;
+      q.options.forEach((opt, j) => {
+        html += `
+            <button class="answer-opt" onclick="selectPentest('${key}',${j},${q.correct},'${eIdx}','${qIdx}')">
+              <span class="answer-letter">${letters[j]}</span>
+              <span class="answer-text">${opt}</span>
+            </button>`;
+      });
+      html += `</div>
+          <div class="feedback-box" id="ptFb_${key}">
+            <div class="feedback-title" id="ptFbTitle_${key}"></div>
+            <div class="feedback-text" id="ptFbText_${key}"></div>
+          </div>
+        </div>`;
+      labState.ptAnswered[key] = false;
+      labState.ptQuestions = labState.ptQuestions || {};
+      labState.ptQuestions[key] = q;
+    });
+
+    html += `</div>`;
+  });
+
+  document.getElementById('labDetailView').innerHTML = html;
+}
+
+function selectPentest(key, optIdx, correct) {
+  if (labState.ptAnswered[key]) return;
+  labState.ptAnswered[key] = true;
+  document.querySelectorAll(`#ptOpts_${key} .answer-opt`).forEach((btn, j) => {
+    btn.onclick = null;
+    if (j === correct) btn.classList.add('correct');
+    if (j === optIdx && optIdx !== correct) btn.classList.add('incorrect');
+  });
+  const isCorrect = optIdx === correct;
+  if (isCorrect) labState.ptCorrect++;
+  const fb = document.getElementById(`ptFb_${key}`);
+  fb.className = 'feedback-box show ' + (isCorrect ? 'pass' : 'fail');
+  document.getElementById(`ptFbTitle_${key}`).textContent = isCorrect ? '✓ CORRECT' : '✗ INCORRECT';
+  document.getElementById(`ptFbText_${key}`).innerHTML = labState.ptQuestions[key].exp;
+  document.getElementById('ptScore').textContent = `${labState.ptCorrect} / ${labState.ptTotal}`;
 }
 
 </script>

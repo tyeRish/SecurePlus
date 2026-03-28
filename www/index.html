@@ -374,8 +374,8 @@
   .quiz-timer {
     font-family: 'Orbitron', monospace;
     font-size: 16px;
-    color: var(--accent-orange);
-    font-weight: 700;
+    color: #888;
+    font-weight: 500;
   }
 
   .quiz-timer.urgent { color: var(--accent-red); animation: pulse 0.5s infinite; }
@@ -1076,6 +1076,18 @@
   </div>
 </div>
 
+<!-- PAYWALL MODAL -->
+<div class="modal-overlay" id="paywallModal" onclick="if(event.target===this)this.classList.remove('show')" style="align-items:center;padding:24px">
+  <div style="background:var(--bg-card);border:1px solid rgba(0,212,255,0.2);border-radius:16px;padding:28px;max-width:360px;width:100%;text-align:center">
+    <div style="font-size:32px;margin-bottom:12px">🔒</div>
+    <div style="font-family:'Orbitron',monospace;font-size:14px;color:var(--accent-cyan);letter-spacing:2px;margin-bottom:8px">PREMIUM CONTENT</div>
+    <div id="paywallFeatureName" style="font-size:18px;font-weight:700;color:var(--text-primary);margin-bottom:12px"></div>
+    <div style="font-size:13px;color:var(--text-secondary);margin-bottom:20px;line-height:1.5">Unlock <strong>all 160+ questions</strong>, domain drills, the half exam, and all performance-based labs with a one-time $4.99 purchase.</div>
+    <button onclick="purchasePremium()" style="width:100%;background:linear-gradient(135deg,var(--accent-cyan),var(--accent-purple));border:none;border-radius:10px;padding:14px;font-family:'Orbitron',monospace;font-size:13px;color:#000;font-weight:700;letter-spacing:1px;cursor:pointer;margin-bottom:10px">UNLOCK FOR $4.99</button>
+    <button onclick="document.getElementById('paywallModal').classList.remove('show')" style="width:100%;background:transparent;border:1px solid var(--border);border-radius:10px;padding:12px;font-family:'Share Tech Mono',monospace;font-size:12px;color:var(--text-secondary);cursor:pointer">MAYBE LATER</button>
+  </div>
+</div>
+
 <script>
 // ============================================================
 // DATA
@@ -1239,6 +1251,54 @@ Tests the running application from outside like an attacker. No source code need
 <strong>IAST (Interactive AST)</strong><br>
 Agents embedded inside the running application monitor it during testing. Best coverage, most complex to deploy.<br><br>
 <div class="highlight">SDLC placement: SAST early (coding) → IAST during QA → DAST late (staging). Security+ expects you to know which finds what.</div>`
+  },
+  {
+    id: 13,
+    category: "GOVERNANCE",
+    short: "<strong>RTO</strong> = max downtime allowed. <strong>RPO</strong> = max data loss allowed. Exam hits these back-to-back in scenarios — know the difference cold.",
+    title: "RTO vs RPO vs MTD vs MTBF",
+    body: `These four metrics are guaranteed to appear together in scenario questions. Know exactly what each measures:<br><br>
+<strong>RTO (Recovery Time Objective)</strong><br>
+Max acceptable TIME the system can be offline. 'We must be back in 4 hours.' Drives your recovery strategy (hot site vs. tape restore).<br><br>
+<strong>RPO (Recovery Point Objective)</strong><br>
+Max acceptable DATA LOSS measured in time. 'We can lose at most 1 hour of data.' Drives your backup frequency.<br><br>
+<strong>MTD (Maximum Tolerable Downtime)</strong><br>
+The absolute ceiling — beyond this, the business faces irreversible damage. RTO must be less than MTD.<br><br>
+<strong>MTBF (Mean Time Between Failures)</strong><br>
+Average time between failures. Higher = more reliable. Used for procurement and maintenance planning.<br><br>
+<strong>MTTR (Mean Time to Repair)</strong><br>
+Average time to restore after failure. Availability = MTBF ÷ (MTBF + MTTR).<br><br>
+<div class="highlight">Scenario shortcut: if the question talks about DOWNTIME → RTO/MTD. If it talks about DATA LOSS → RPO. If it talks about RELIABILITY/FAILURE RATE → MTBF/MTTR.</div>`
+  },
+  {
+    id: 14,
+    category: "IDENTITY & ACCESS",
+    short: "<strong>SAML</strong> = enterprise SSO with XML assertions. <strong>OAuth 2.0</strong> = delegated API access. <strong>OIDC</strong> = identity layer on top of OAuth. Know which does what.",
+    title: "SAML vs OAuth 2.0 vs OpenID Connect",
+    body: `CompTIA SY0-701 loves testing federation protocol differences. Here's the breakdown:<br><br>
+<strong>SAML 2.0</strong><br>
+XML-based. Enterprise SSO standard. IdP issues a signed XML assertion to a Service Provider. 'Log in with company AD to access Salesforce.' Think: big enterprise, legacy SaaS.<br><br>
+<strong>OAuth 2.0</strong><br>
+Authorization framework — grants delegated API access. Issues an access token. 'Allow this app to post to Twitter on your behalf.' It does NOT authenticate the user to the app. Think: API access delegation.<br><br>
+<strong>OpenID Connect (OIDC)</strong><br>
+Authentication layer built on top of OAuth 2.0. Adds an ID Token (JWT) that proves who the user is. 'Sign in with Google.' Think: modern consumer SSO, mobile apps.<br><br>
+<div class="highlight">Memory trick — SAML: enterprise XML. OAuth: API authorization. OIDC: authentication. The exam will give you a scenario and you must pick the right one.</div>`
+  },
+  {
+    id: 15,
+    category: "RISK MANAGEMENT",
+    short: "<strong>SLE = AV × EF</strong>. <strong>ALE = SLE × ARO</strong>. The math is simple — people freeze because they forget the formulas. Run it once and it sticks.",
+    title: "Risk Calculation: AV, EF, SLE, ALE",
+    body: `The risk math formulas on Security+ are simple arithmetic — but people blank under pressure. Here they are:<br><br>
+<strong>Asset Value (AV)</strong> — what the asset is worth in dollars.<br><br>
+<strong>Exposure Factor (EF)</strong> — % of asset value destroyed in one incident (0–1.0).<br><br>
+<strong>SLE (Single Loss Expectancy) = AV × EF</strong><br>
+Expected loss from one occurrence. Server worth $200K, 50% destroyed = SLE $100K.<br><br>
+<strong>ARO (Annualized Rate of Occurrence)</strong> — how many times per year the event is expected.<br><br>
+<strong>ALE (Annualized Loss Expectancy) = SLE × ARO</strong><br>
+Expected annual cost of the risk. SLE $100K, happens twice/year = ALE $200K.<br><br>
+<strong>Cost-Benefit Rule:</strong> Only implement a control if its annual cost < ALE reduction it provides.<br><br>
+<div class="highlight">Run through the numbers: AV=$500K, EF=0.6 → SLE=$300K. ARO=2 → ALE=$600K. A $150K/yr control that halves the ALE saves $150K net.</div>`
   }
 ];
 
@@ -1813,6 +1873,39 @@ let quiz = {
   mode: 'full'
 };
 
+// ============================================================
+// PREMIUM / PAYWALL
+// Set BETA_MODE = true during closed beta (everyone gets full access).
+// Set to false on public launch to enforce the paywall.
+// ============================================================
+const BETA_MODE = true; // ← flip to false at launch
+
+function isPremium() {
+  if (BETA_MODE) return true;
+  try {
+    return localStorage.getItem('secplusPremium') === 'true';
+  } catch(e) { return false; }
+}
+
+function unlockPremium() {
+  // Called after successful Google Play IAP verification
+  try { localStorage.setItem('secplusPremium', 'true'); } catch(e) {}
+  document.getElementById('paywallModal').classList.remove('show');
+  showToast('Premium unlocked! All content is now available.');
+}
+
+async function purchasePremium() {
+  // TODO: integrate @capgo/capacitor-purchases or Google Play Billing plugin here.
+  // The plugin will verify the purchase with Google Play and call unlockPremium() on success.
+  // For now, show a placeholder message.
+  showToast('IAP integration coming — see purchasePremium() in source.');
+}
+
+function showPaywall(featureName) {
+  document.getElementById('paywallFeatureName').textContent = featureName || 'This feature';
+  document.getElementById('paywallModal').classList.add('show');
+}
+
 // Load state from localStorage
 try {
   const saved = localStorage.getItem('secplusState');
@@ -1893,20 +1986,22 @@ function initHome() {
   const t = TIDBITS[state.currentTidbit % TIDBITS.length];
   document.getElementById('tidbitText').innerHTML = t.short;
 
-  // Domain list
+  // Domain list — bar shows readiness (answered/total), text shows accuracy
   const dl = document.getElementById('domainList');
   dl.innerHTML = '';
   DOMAINS.forEach(d => {
     const stats = state.domainStats[d.name] || { answered: 0, correct: 0 };
-    const dpct = stats.answered > 0 ? Math.round((stats.correct / stats.answered) * 100) : 0;
+    const totalInDomain = QUESTIONS.filter(q => q.domain === d.name).length;
+    const readinessPct = totalInDomain > 0 ? Math.round((stats.answered / totalInDomain) * 100) : 0;
+    const accuracyPct = stats.answered > 0 ? Math.round((stats.correct / stats.answered) * 100) : 0;
     dl.innerHTML += `
       <div class="domain-item">
         <div class="domain-top">
           <div class="domain-name">${d.name}</div>
-          <div class="domain-pct" style="color:${d.color}">${dpct}%</div>
+          <div class="domain-pct" style="color:${d.color}">${readinessPct}%</div>
         </div>
-        <div class="domain-bar"><div class="domain-fill" style="width:${dpct}%; background: linear-gradient(90deg, ${d.color}, ${d.color}88)"></div></div>
-        <div class="domain-weight">EXAM WEIGHT: ${d.weight} · ${stats.answered} answered</div>
+        <div class="domain-bar"><div class="domain-fill" style="width:${readinessPct}%; background: linear-gradient(90deg, ${d.color}, ${d.color}88)"></div></div>
+        <div class="domain-weight">EXAM WEIGHT: ${d.weight} · ${stats.answered}/${totalInDomain} seen · ${accuracyPct}% accurate</div>
       </div>`;
   });
 }
@@ -2052,10 +2147,12 @@ function startQuickFire() {
 }
 
 function showDomainPicker() {
+  if (!isPremium()) { showPaywall('Domain Drill'); return; }
   showScreen('domainPickScreen');
 }
 
 function startDomainDrill(domain) {
+  if (!isPremium()) { showPaywall('Domain Drill'); return; }
   const pool = QUESTIONS.filter(q => q.domain === domain);
   quiz.mode = 'domain';
   quiz.current = 0;
@@ -2070,6 +2167,9 @@ function startDomainDrill(domain) {
 }
 
 function startQuiz(mode) {
+  // Paywall gates
+  if (mode === 'half' && !isPremium()) { showPaywall('Half Exam'); return; }
+
   quiz.mode = mode;
   quiz.current = 0;
   quiz.correct = 0;
@@ -2077,7 +2177,17 @@ function startQuiz(mode) {
   quiz.startTime = Date.now();
 
   if (mode === 'fast') {
-    quiz.questions = shuffle([...QUESTIONS]).slice(0, 20);
+    if (isPremium()) {
+      quiz.questions = shuffle([...QUESTIONS]).slice(0, 20);
+    } else {
+      // Free: 2 questions per domain max (10 total)
+      const freePool = [];
+      DOMAINS.forEach(d => {
+        const domainQs = QUESTIONS.filter(q => q.domain === d.name);
+        freePool.push(...shuffle([...domainQs]).slice(0, 2));
+      });
+      quiz.questions = shuffle(freePool);
+    }
     quiz.timeLeft = 60 * 30;
   } else if (mode === 'half') {
     quiz.questions = shuffle([...QUESTIONS]).slice(0, 45);
@@ -2937,6 +3047,284 @@ const EXTRA_QUESTIONS = [
     options: ["White Box Pen Test", "Red Team Exercise (covert)", "Purple Team Exercise", "Tabletop Exercise"],
     correct: 2,
     explanation: "<strong>Purple Team Exercise</strong> combines red (offensive) and blue (defensive) working collaboratively — red demonstrates a TTP, blue tunes detection, they discuss what worked and what didn't. Key benefit: knowledge transfer maximizes defensive improvement. Contrast: <strong>Red Team</strong> = covert, blue unaware; <strong>Tabletop</strong> = discussion only, no technical execution."
+  },
+
+  // ---- QUESTIONS 121–160: KNOWLEDGE GAP FILL ----
+
+  // WIRELESS SECURITY
+  { id: 121, domain: "IMPLEMENTATION",
+    text: "WPA3 replaces the WPA2 Pre-Shared Key (PSK) authentication mechanism with a more secure handshake. What protocol does WPA3-Personal use?",
+    options: ["TKIP", "SAE (Simultaneous Authentication of Equals)", "EAP-TLS", "CCMP-128"],
+    correct: 1,
+    explanation: "<strong>SAE (Simultaneous Authentication of Equals)</strong> — also called Dragonfly — replaces PSK in WPA3-Personal. Unlike WPA2's 4-way handshake, SAE uses zero-knowledge proof so the password is never sent over the air, and capturing the handshake gives an attacker nothing useful to brute force offline."
+  },
+  { id: 122, domain: "IMPLEMENTATION",
+    text: "WPA3 mandates a feature that encrypts management frames (probe, beacon, deauthentication) to prevent spoofed disconnects. What is this feature called?",
+    options: ["WPA3-Enterprise", "Protected Management Frames (PMF / 802.11w)", "Forward Secrecy", "CCMP-256"],
+    correct: 1,
+    explanation: "<strong>PMF (Protected Management Frames)</strong> — IEEE 802.11w — authenticates management frames, making deauthentication flood attacks impossible. WPA3 makes PMF mandatory. In WPA2, it was optional — which is why deauth attacks still work against most WPA2 networks today."
+  },
+  { id: 123, domain: "THREATS & ATTACKS",
+    text: "An attacker near a coffee shop broadcasts the same SSID as the shop's Wi-Fi with a stronger signal. Clients connect automatically and their traffic is intercepted. The attacker presents valid HTTPS certificates using a transparent proxy. What attack is this?",
+    options: ["Deauth Attack", "Karma Attack", "Evil Twin with TLS interception", "War Driving"],
+    correct: 2,
+    explanation: "<strong>Evil Twin with TLS interception (MitM)</strong>: the rogue AP captures all traffic. HTTPS is defeated by a transparent MITM proxy presenting forged certificates — users see warnings only if they check, or if certificate pinning is active. Defense: <strong>802.1X/EAP-TLS</strong> (client verifies AP certificate before joining), <strong>VPN on untrusted Wi-Fi</strong>, <strong>HSTS preloading</strong>."
+  },
+  { id: 124, domain: "THREATS & ATTACKS",
+    text: "A security researcher captures WPA2 handshakes during a deauthentication attack and then runs a GPU-based dictionary attack offline. Which WPA3 feature specifically defeats this offline cracking?",
+    options: ["AES-256-GCMP encryption", "SAE providing forward secrecy", "PMF encrypting management frames", "WPA3-Enterprise certificate requirement"],
+    correct: 1,
+    explanation: "<strong>SAE forward secrecy</strong>: each WPA3 session derives a unique key — capturing the authentication exchange yields nothing usable for offline brute force. In WPA2, the 4-way handshake contains enough information to attempt dictionary attacks against the PSK offline. SAE's design means even an observer who captured the handshake can't derive session keys."
+  },
+  { id: 125, domain: "IMPLEMENTATION",
+    text: "An organization deploys WPA2-Enterprise. Employees authenticate with domain credentials. Rogue APs are a concern. Which EAP method protects against rogue APs by requiring mutual authentication with certificates on BOTH client and server?",
+    options: ["EAP-MD5", "PEAP-MSCHAPv2", "EAP-TLS", "LEAP"],
+    correct: 2,
+    explanation: "<strong>EAP-TLS</strong> requires both the RADIUS server AND the client to present X.509 certificates — true mutual authentication. A rogue AP cannot impersonate the legitimate RADIUS server without the real certificate. <strong>PEAP</strong> only authenticates the server (one-way), making client credentials visible to a rogue AP with a fake certificate. EAP-TLS is the gold standard but requires client certificate infrastructure."
+  },
+
+  // PKI / CERTIFICATE TROUBLESHOOTING
+  { id: 126, domain: "IMPLEMENTATION",
+    text: "A user's browser displays 'Certificate not trusted — issuer unknown.' The server certificate was signed by an intermediate CA. What is the most likely cause?",
+    options: ["The certificate has expired", "The intermediate CA certificate is missing from the server's chain", "The certificate uses a weak hash algorithm", "The domain name doesn't match the CN"],
+    correct: 1,
+    explanation: "Browsers trust <strong>root CAs</strong> in their store, not intermediate CAs. The server must send the complete chain: leaf cert → intermediate CA cert → (root is already trusted). If the intermediate cert is missing, the browser cannot build a trusted path — 'issuer unknown.' Fix: configure the server to include the full chain bundle. Root cert is NOT sent by the server (already in browser store)."
+  },
+  { id: 127, domain: "IMPLEMENTATION",
+    text: "A certificate was compromised before its expiration date. The CA adds it to a signed, timestamped list published at a known URL. What is this mechanism?",
+    options: ["OCSP Stapling", "Certificate Transparency Log", "CRL (Certificate Revocation List)", "HSTS Preload"],
+    correct: 2,
+    explanation: "<strong>CRL (Certificate Revocation List)</strong> — a CA-signed list of revoked certificate serial numbers. Clients download it periodically (can be large/stale). <strong>OCSP</strong> is the real-time alternative (query a specific cert status). <strong>OCSP Stapling</strong> has the server pre-fetch its own OCSP response and include it in the TLS handshake, improving privacy and performance."
+  },
+  { id: 128, domain: "IMPLEMENTATION",
+    text: "A browser queries the CA's server in real time before completing a TLS connection to verify a specific certificate's status. The CA responds with 'good,' 'revoked,' or 'unknown.' What protocol is this?",
+    options: ["CRL", "OCSP", "OCSP Stapling", "CT Log"],
+    correct: 1,
+    explanation: "<strong>OCSP (Online Certificate Status Protocol)</strong> — real-time single-certificate check against the CA's OCSP responder. Disadvantage: reveals browsing habits to the CA (privacy leak) and adds latency. <strong>OCSP Stapling</strong> solves both: server pre-fetches the CA-signed OCSP response and includes it in the TLS handshake — no browser-to-CA query needed."
+  },
+  { id: 129, domain: "IMPLEMENTATION",
+    text: "A company's internal web app uses a certificate signed by their private CA. Employees get 'untrusted certificate' errors despite the certificate being valid. What is the fix?",
+    options: ["Buy a certificate from a public CA", "Distribute the private CA's root certificate to all employee devices/browsers", "Enable OCSP on the private CA", "Extend the certificate validity period"],
+    correct: 1,
+    explanation: "Browsers trust only <strong>pre-installed root CAs</strong>. A private/internal CA is unknown to browsers by default. The fix: push the <strong>private root CA certificate</strong> to all managed devices via GPO, MDM, or manual install. Once installed as a trusted root, all certs signed by it are trusted. This is standard for enterprise internal PKI."
+  },
+  { id: 130, domain: "IMPLEMENTATION",
+    text: "An attacker obtains a certificate for 'g00gle.com' from a rogue CA that was somehow added to browser trust stores. Which mechanism provides the ability to detect and audit such misissuance?",
+    options: ["OCSP Must-Staple", "HSTS", "Certificate Transparency (CT) Logs", "DNSSEC"],
+    correct: 2,
+    explanation: "<strong>Certificate Transparency (CT) Logs</strong> — all publicly trusted CAs must log every certificate issued to append-only public logs. Browsers reject certs not in CT logs. Domain owners can monitor logs for unauthorized certificates issued for their domain. The DigiNotar breach (2011) — issuing fraudulent Google certs — drove the development of CT."
+  },
+
+  // CLOUD-SPECIFIC THREATS
+  { id: 131, domain: "THREATS & ATTACKS",
+    text: "A developer accidentally configures an S3 bucket with public READ access. Automated scanners find it within hours. What is the primary risk of a misconfigured public S3 bucket?",
+    options: ["DDoS amplification using the bucket", "Unauthorized data exfiltration of stored objects", "Remote code execution on AWS infrastructure", "Crypto mining on the S3 storage layer"],
+    correct: 1,
+    explanation: "<strong>Unauthorized data exfiltration</strong> — any internet user can enumerate and download all objects. Billions of records have been exposed this way (Capital One, GoDaddy, etc.). AWS S3 now blocks public access by default ('Block Public Access' setting). Defense: enable S3 Block Public Access at the account level, use AWS Config rules to detect public buckets, audit IAM bucket policies regularly."
+  },
+  { id: 132, domain: "ARCHITECTURE",
+    text: "In the AWS shared responsibility model, who is responsible for patching the hypervisor underlying EC2 instances?",
+    options: ["The customer — they own the EC2 instance", "AWS — they own and maintain the underlying infrastructure", "It is shared equally", "The customer's cloud security team"],
+    correct: 1,
+    explanation: "<strong>AWS</strong> owns and patches the hypervisor, physical hardware, and networking infrastructure. The customer owns everything above the hypervisor: the OS, applications, data, network configuration, IAM policies, and security groups. This is the core IaaS shared responsibility split. Common exam trap: who patches the OS? → Customer. Who patches the hypervisor? → AWS."
+  },
+  { id: 133, domain: "THREATS & ATTACKS",
+    text: "An attacker exploits a web app to make requests to http://169.254.169.254/latest/meta-data/iam/security-credentials/ and retrieves temporary AWS IAM keys. What attack enabled this?",
+    options: ["XXE Injection", "CSRF", "SSRF exploiting cloud metadata service", "Open Redirect"],
+    correct: 2,
+    explanation: "<strong>SSRF against the AWS Instance Metadata Service (IMDS)</strong> — 169.254.169.254 is the link-local address only reachable from within the EC2 instance. SSRF uses the server as a proxy to reach it and steal IAM role credentials. Defense: enforce <strong>IMDSv2</strong> (requires a PUT token, defeating SSRF), use AWS VPC endpoint policies, apply strict allowlists for outbound SSRF in WAF."
+  },
+  { id: 134, domain: "ARCHITECTURE",
+    text: "A SaaS vendor is breached and customer data is exposed. The customer argues the vendor should have encrypted data at rest. The vendor says encryption at rest is the customer's responsibility. According to the standard SaaS shared responsibility model, who is correct?",
+    options: ["The customer — they own the data and must encrypt it", "The vendor — in SaaS, the provider manages encryption at rest", "Both share equal responsibility", "Neither — SaaS doesn't support encryption at rest"],
+    correct: 1,
+    explanation: "In <strong>SaaS</strong>, the provider manages the application, platform, OS, and infrastructure — including <strong>encryption at rest</strong>. The customer is responsible for data they input, user access controls (who has accounts), and configuration. Contrast with IaaS where the customer manages encryption. SaaS responsibility boundary: customer controls <em>access to</em> the SaaS, provider controls <em>security of</em> the SaaS."
+  },
+  { id: 135, domain: "THREATS & ATTACKS",
+    text: "An attacker gains access to one container in a Kubernetes cluster and exploits a misconfigured RBAC policy to read secrets from other namespaces, including database credentials. What attack is this an example of?",
+    options: ["Container escape to host OS", "Privilege escalation via misconfigured RBAC", "Supply chain attack on container image", "Cryptojacking"],
+    correct: 1,
+    explanation: "<strong>Privilege escalation via misconfigured RBAC</strong> — over-permissive Kubernetes RBAC allows a compromised pod to read secrets cluster-wide. Defense: principle of least privilege in K8s RBAC (namespace-scoped roles, not cluster-wide), use <code>kubectl auth can-i</code> to audit permissions, seal secrets with tools like Sealed Secrets or Vault, network policies to restrict pod communication."
+  },
+
+  // IDENTITY FEDERATION
+  { id: 136, domain: "IMPLEMENTATION",
+    text: "A user logs into their company's identity provider (IdP) and is then automatically logged into Salesforce without entering credentials again. Salesforce sends an XML assertion verifying the user's identity. Which protocol is in use?",
+    options: ["OAuth 2.0", "OpenID Connect", "SAML 2.0", "Kerberos"],
+    correct: 2,
+    explanation: "<strong>SAML 2.0</strong> — XML-based federation standard for enterprise SSO. The IdP issues a signed XML <strong>assertion</strong> to the Service Provider (Salesforce). SAML is the dominant protocol for enterprise B2B federation. Key roles: <strong>IdP</strong> (authenticates user, issues assertions), <strong>SP</strong> (trusts the IdP, grants access based on assertion)."
+  },
+  { id: 137, domain: "IMPLEMENTATION",
+    text: "A mobile app wants to let users log in with their Google account. Google authenticates the user and issues an <strong>access token</strong> that the app uses to call Google APIs on the user's behalf — but the app never sees the user's Google credentials. Which protocol is this?",
+    options: ["SAML 2.0", "OpenID Connect", "OAuth 2.0", "RADIUS"],
+    correct: 2,
+    explanation: "<strong>OAuth 2.0</strong> is an <em>authorization</em> framework — it grants delegated access (the app gets an access token to call APIs <em>on behalf of</em> the user) but doesn't authenticate the user's identity to the app itself. It answers: 'can this app access this resource?' not 'who is this user?' For identity, OAuth is extended by <strong>OpenID Connect</strong>."
+  },
+  { id: 138, domain: "IMPLEMENTATION",
+    text: "An app needs to verify the user's identity (not just get API access) — it receives a signed JWT called an ID token containing the user's name, email, and unique subject identifier. Which protocol provides this identity layer on top of OAuth 2.0?",
+    options: ["SAML 2.0", "OAuth 2.0 alone", "OpenID Connect (OIDC)", "LDAP"],
+    correct: 2,
+    explanation: "<strong>OpenID Connect (OIDC)</strong> adds an <strong>ID Token</strong> (JWT) to OAuth 2.0, providing authentication. The ID token is signed by the IdP and contains the user's identity claims. Key distinction: <strong>OAuth 2.0</strong> = authorization (access tokens for APIs), <strong>OIDC</strong> = authentication (ID tokens proving who the user is). Modern consumer SSO ('Sign in with Google') uses OIDC."
+  },
+  { id: 139, domain: "IMPLEMENTATION",
+    text: "An organization wants employees to access cloud SaaS apps with their Active Directory credentials. The IdP sends XML assertions. Which protocol/standard best describes this enterprise federation?",
+    options: ["OAuth 2.0 with PKCE", "OIDC with JWT", "SAML 2.0 with AD FS or Azure AD", "RADIUS with LDAP backend"],
+    correct: 2,
+    explanation: "<strong>SAML 2.0</strong> with <strong>AD FS</strong> (Active Directory Federation Services) or <strong>Azure AD</strong> is the standard enterprise solution. AD FS acts as the IdP, validates against AD, issues SAML assertions to SaaS apps. This is how most enterprise SSO works. OAuth/OIDC is more common in consumer/developer contexts; SAML dominates legacy enterprise."
+  },
+  { id: 140, domain: "IMPLEMENTATION",
+    text: "A token-based authentication system issues a signed JSON object containing the user's claims (subject, roles, expiry). The token is validated by verifying its digital signature — no server-side session lookup required. What is this token format?",
+    options: ["SAML Assertion", "Kerberos TGT", "JWT (JSON Web Token)", "OAuth Refresh Token"],
+    correct: 2,
+    explanation: "<strong>JWT (JSON Web Token)</strong> — three Base64-encoded parts: Header (algorithm), Payload (claims: sub, iat, exp, roles), Signature (HMAC or RSA/ECDSA). Stateless: any server with the signing key can verify independently — no session store. Used by OIDC (ID token), OAuth 2.0 (access token), and standalone API auth. Security: always verify signature, check expiry, validate audience claim."
+  },
+
+  // GOVERNANCE — NIST, BCP/DR, RISK
+  { id: 141, domain: "GOVERNANCE",
+    text: "An organization calculates that 60% of an asset would be destroyed in a single ransomware event. The asset is valued at $500,000. What is the Single Loss Expectancy (SLE)?",
+    options: ["$500,000", "$300,000", "$200,000", "$30,000"],
+    correct: 1,
+    explanation: "<strong>SLE = AV × EF</strong>. Asset Value (AV) = $500,000. Exposure Factor (EF) = 0.60. SLE = $500,000 × 0.60 = <strong>$300,000</strong>. SLE represents the expected loss from a single occurrence of the threat. The next step is ALE = SLE × ARO (annualized rate of occurrence) to get annual expected loss."
+  },
+  { id: 142, domain: "GOVERNANCE",
+    text: "An organization estimates ransomware will hit twice per year. The SLE is $300,000. What is the Annualized Loss Expectancy (ALE)?",
+    options: ["$150,000", "$300,000", "$600,000", "$900,000"],
+    correct: 2,
+    explanation: "<strong>ALE = SLE × ARO</strong>. SLE = $300,000. ARO (Annualized Rate of Occurrence) = 2. ALE = $300,000 × 2 = <strong>$600,000</strong>. ALE is the expected annual cost of a risk — used to justify security spending. If a control costs $200,000/year and reduces ALE from $600,000 to $100,000, it saves $300,000 net."
+  },
+  { id: 143, domain: "GOVERNANCE",
+    text: "A disaster recovery plan states that systems must be recovered within 4 hours of a failure. What metric is this?",
+    options: ["RPO (Recovery Point Objective)", "RTO (Recovery Time Objective)", "MTTR (Mean Time to Repair)", "MTBF (Mean Time Between Failures)"],
+    correct: 1,
+    explanation: "<strong>RTO (Recovery Time Objective)</strong> — maximum acceptable downtime. 'We must be back online within 4 hours.' Drives the choice of recovery strategy (hot standby vs. tape restore). Companion metric: <strong>RPO (Recovery Point Objective)</strong> — maximum acceptable data loss. 'We can lose at most 1 hour of data' → backup every hour."
+  },
+  { id: 144, domain: "GOVERNANCE",
+    text: "After a database outage, a company discovers it lost 6 hours of transaction data because backups ran every 6 hours. The BCP specifies a maximum tolerable data loss of 1 hour. Which metric was violated?",
+    options: ["RTO", "RPO", "MTBF", "MTD"],
+    correct: 1,
+    explanation: "<strong>RPO (Recovery Point Objective)</strong> — max acceptable data loss measured in time. RPO of 1 hour requires backups (or replication) at minimum every 1 hour. A 6-hour backup interval means up to 6 hours of data can be lost — violating the 1-hour RPO. Solution: continuous replication, more frequent snapshots, or log shipping."
+  },
+  { id: 145, domain: "GOVERNANCE",
+    text: "Which metric represents the maximum total time a business process can be disrupted before the organization faces irreversible damage — including the time to recover?",
+    options: ["RTO", "RPO", "MTD (Maximum Tolerable Downtime)", "MTBF"],
+    correct: 2,
+    explanation: "<strong>MTD (Maximum Tolerable Downtime)</strong> — also called MTO (Maximum Tolerable Outage) — the absolute maximum time a business function can be offline before causing irreversible harm (financial, legal, competitive). <strong>RTO must be less than MTD</strong>. If MTD = 8 hours, your RTO must target something less (e.g., 4 hours) to have a safety margin."
+  },
+  { id: 146, domain: "GOVERNANCE",
+    text: "A server has been running for 2,000 hours and has failed 4 times. What is the Mean Time Between Failures (MTBF)?",
+    options: ["400 hours", "500 hours", "800 hours", "2000 hours"],
+    correct: 1,
+    explanation: "<strong>MTBF = Total operating time ÷ Number of failures</strong> = 2,000 ÷ 4 = <strong>500 hours</strong>. Higher MTBF = more reliable. MTBF informs availability calculations and maintenance schedules. Companion: <strong>MTTR (Mean Time to Repair)</strong> — average time to restore after failure. Availability = MTBF ÷ (MTBF + MTTR)."
+  },
+  { id: 147, domain: "GOVERNANCE",
+    text: "An organization's BCP designates an alternate site that is fully configured with systems and data already synchronized — capable of taking over within minutes of a primary site failure. What type of alternate site is this?",
+    options: ["Cold Site", "Warm Site", "Hot Site", "Mobile Site"],
+    correct: 2,
+    explanation: "<strong>Hot Site</strong> — fully operational duplicate with live data synchronization. Failover time: minutes. Highest cost. <strong>Warm Site</strong>: pre-configured hardware, needs data restore (hours). <strong>Cold Site</strong>: just the physical space, everything else must be set up (days/weeks). Choice driven by RTO: very low RTO → hot site. Cost vs. recovery time tradeoff."
+  },
+  { id: 148, domain: "GOVERNANCE",
+    text: "The NIST Cybersecurity Framework is organized around five core functions. Which correctly orders them?",
+    options: [
+      "Prevent, Detect, Respond, Recover, Review",
+      "Identify, Protect, Detect, Respond, Recover",
+      "Assess, Protect, Monitor, Respond, Review",
+      "Plan, Prevent, Detect, Contain, Recover"
+    ],
+    correct: 1,
+    explanation: "<strong>NIST CSF Five Functions: Identify → Protect → Detect → Respond → Recover</strong>. Identify: understand assets/risks. Protect: implement controls. Detect: find incidents. Respond: contain and remediate. Recover: restore and improve. NIST CSF is a voluntary risk-based framework — not prescriptive compliance. Used widely for maturity assessments and gap analysis."
+  },
+  { id: 149, domain: "GOVERNANCE",
+    text: "A company's risk treatment plan decides to purchase cyber insurance for a risk that is too expensive to mitigate and too impactful to accept. What risk treatment option is this?",
+    options: ["Risk Avoidance", "Risk Mitigation", "Risk Transfer", "Risk Acceptance"],
+    correct: 2,
+    explanation: "<strong>Risk Transfer</strong> — shifting financial impact to a third party (insurance, contractual liability). It doesn't eliminate the risk, just transfers the financial consequences. <strong>Avoidance</strong>: eliminate the activity causing risk. <strong>Mitigation</strong>: reduce likelihood or impact. <strong>Acceptance</strong>: acknowledge risk and take no action (documented, residual risk within tolerance)."
+  },
+  { id: 150, domain: "GOVERNANCE",
+    text: "A DR test fully activates the alternate site and switches production traffic to it for 24 hours. This is the most realistic test type but carries the highest risk of disruption. What is this test called?",
+    options: ["Tabletop Exercise", "Walk-through / Checklist Test", "Simulation Test", "Full Interruption Test"],
+    correct: 3,
+    explanation: "<strong>Full Interruption Test</strong> — actual failover to the DR site with live production traffic. Most realistic, validates the entire plan end-to-end. Highest risk: if the DR site fails too, the organization has no production. Test types low→high risk: <strong>Tabletop</strong> (discussion) → <strong>Walk-through</strong> (checklist) → <strong>Simulation</strong> (parallel, no cutover) → <strong>Full Interruption</strong> (actual cutover)."
+  },
+
+  // OPERATIONS — FORENSICS, THREAT HUNTING
+  { id: 151, domain: "OPERATIONS",
+    text: "A forensic investigator arrives at a running server after a breach. In what order should volatile evidence be collected, from most to least volatile?",
+    options: [
+      "Hard drive → RAM → Network connections → Running processes",
+      "RAM → Running processes → Network connections → Hard drive",
+      "Network connections → RAM → Running processes → Hard drive",
+      "Running processes → Hard drive → RAM → Network connections"
+    ],
+    correct: 1,
+    explanation: "<strong>Order of Volatility (most → least)</strong>: CPU registers/cache → <strong>RAM</strong> → <strong>Running processes/network connections</strong> → Hard drive → Removable media → Backup tapes. Collect most volatile first — RAM is lost on shutdown. Fileless malware lives only in RAM. Use tools like <strong>Volatility</strong> for RAM forensics. Pulling the power without a RAM dump destroys critical evidence."
+  },
+  { id: 152, domain: "OPERATIONS",
+    text: "An analyst running Volatility on a memory dump finds a process named 'svchost.exe' with no parent process, running from C:\\Temp\\, with outbound connections to a foreign IP. What is the significance of these indicators?",
+    options: [
+      "Normal behavior — svchost.exe always runs from Temp",
+      "Indicators of process masquerading / process injection",
+      "Evidence of a hardware keylogger",
+      "Normal Windows Update process"
+    ],
+    correct: 1,
+    explanation: "<strong>Process masquerading</strong> — legitimate Windows processes (svchost, lsass, explorer) are commonly impersonated by malware. Red flags: <strong>wrong parent process</strong> (real svchost is always a child of services.exe), <strong>wrong path</strong> (real svchost is in C:\\Windows\\System32), <strong>outbound connections</strong> (real svchost rarely initiates external connections). These are classic IOCs in memory forensics."
+  },
+  { id: 153, domain: "OPERATIONS",
+    text: "After eradicating a breach, the IR team discovers the attacker maintained persistence via a scheduled task that re-installs the RAT if it's deleted. Which IR phase did the team fail to fully complete before Recovery?",
+    options: ["Identification", "Containment", "Eradication", "Lessons Learned"],
+    correct: 2,
+    explanation: "<strong>Eradication</strong> — removing all traces of the attacker: malware, persistence mechanisms (scheduled tasks, registry run keys, WMI subscriptions, startup items), attacker accounts, and backdoors. Incomplete eradication means the attacker survives 'cleanup.' Never move to Recovery until all persistence mechanisms are identified and removed. Threat hunting during eradication is critical."
+  },
+  { id: 154, domain: "OPERATIONS",
+    text: "A threat hunter queries SIEM data looking for hosts that have connected to the same destination IP as a known C2 server from a recent threat report. What is this hunting technique called?",
+    options: ["TTP-based hunting", "IOC-based hunting", "Behavioral baseline hunting", "Anomaly-driven hunting"],
+    correct: 1,
+    explanation: "<strong>IOC-based hunting</strong> (Indicator of Compromise) — searching for known bad indicators: IPs, domains, file hashes, registry keys from threat intel feeds. Fast and actionable but only catches known threats. <strong>TTP-based hunting</strong> hunts for attacker <em>behaviors</em> (MITRE ATT&CK techniques) — catches unknown threats using the same tactics. TTP-based hunting is more advanced and effective."
+  },
+  { id: 155, domain: "OPERATIONS",
+    text: "During a tabletop exercise, the team discovers that the IR playbook doesn't cover ransomware affecting OT systems. What is the primary output of a tabletop exercise?",
+    options: ["A patched vulnerability", "Identified gaps in plans, playbooks, and communication", "A forensic image of infected systems", "An updated risk register"],
+    correct: 1,
+    explanation: "<strong>Tabletop exercises</strong> are discussion-based simulations — no live systems involved. The primary output is <strong>identified gaps</strong> in plans, playbooks, decision-making, communication, and role clarity. They're cost-effective and low-risk. The discovered gap (OT ransomware playbook missing) should trigger a plan update and potentially a more realistic simulation test."
+  },
+
+  // ADDITIONAL WIRELESS
+  { id: 156, domain: "IMPLEMENTATION",
+    text: "An enterprise switches from WPA2-Personal (PSK) to WPA2-Enterprise. The key operational change is that each employee now authenticates with unique credentials rather than a shared password. What backend system does WPA2-Enterprise require?",
+    options: ["A DNS server for credential lookup", "A RADIUS server for centralized AAA", "A PKI CA for certificate issuance only", "An LDAP server with anonymous bind"],
+    correct: 1,
+    explanation: "<strong>RADIUS server</strong> — WPA2-Enterprise uses 802.1X, which requires a RADIUS backend for centralized authentication (AAA). The Wi-Fi AP acts as an <strong>authenticator</strong>, passing credentials to the RADIUS server. Benefits over PSK: unique credentials per user (revoke access individually), audit logs per user, no shared secret to leak."
+  },
+
+  // ADDITIONAL GOVERNANCE
+  { id: 157, domain: "GOVERNANCE",
+    text: "An organization conducts a Business Impact Analysis (BIA) before drafting its BCP. What is the primary purpose of the BIA?",
+    options: [
+      "Identify all possible threats to the organization",
+      "Determine which business functions are most critical and quantify the impact of their disruption",
+      "Test the effectiveness of disaster recovery procedures",
+      "Calculate the cost of security controls"
+    ],
+    correct: 1,
+    explanation: "<strong>BIA (Business Impact Analysis)</strong> identifies critical business processes, quantifies the impact of their disruption (financial, operational, legal, reputational), and determines <strong>RTO, RPO, and MTD</strong> for each. It's the foundation of the BCP — you can't build a recovery plan without knowing what's most critical. Output: prioritized list of functions and their recovery requirements."
+  },
+  { id: 158, domain: "GOVERNANCE",
+    text: "A NIST SP 800-53 control requires that privileged user activity be logged to a separate, tamper-proof audit system that privileged users cannot modify. What security principle does this implement?",
+    options: ["Separation of Duties", "Defense in Depth", "Non-repudiation through protected audit trails", "Least Privilege"],
+    correct: 2,
+    explanation: "<strong>Non-repudiation through protected audit trails</strong> — logs that privileged users cannot alter ensure that administrative actions are attributable and cannot be denied. Also implements <strong>separation of duties</strong> (admins can't erase their own tracks). NIST SP 800-53 is the federal security control catalog; NIST CSF is the framework. SP 800-53 is used for FedRAMP, FISMA compliance."
+  },
+  { id: 159, domain: "GOVERNANCE",
+    text: "A company stores customer credit card data. During a pen test, the tester finds PAN (Primary Account Number) stored unencrypted in a log file accessible to application support staff. Which PCI-DSS requirement is violated?",
+    options: ["Requirement 6 — Develop and maintain secure systems", "Requirement 3 — Protect stored cardholder data", "Requirement 8 — Identify and authenticate access", "Requirement 10 — Log and monitor all access to system components"],
+    correct: 1,
+    explanation: "<strong>PCI-DSS Requirement 3</strong>: protect stored cardholder data. PAN must be rendered unreadable anywhere it's stored (encryption, hashing, tokenization, masking). Storing full PAN in plaintext logs is a direct violation. Key rule: <em>don't store what you don't need</em> — and what you must store, protect with strong cryptography. Log files are a common accidental data exposure vector."
+  },
+  { id: 160, domain: "GOVERNANCE",
+    text: "A security team establishes quantitative measures to track the effectiveness of security controls over time — for example, mean time to patch, % endpoints with AV current, number of phishing simulation failures. What are these measures called?",
+    options: ["KPIs (Key Performance Indicators) / Security Metrics", "CVEs", "Risk Registers", "SLAs"],
+    correct: 0,
+    explanation: "<strong>Security Metrics / KPIs</strong> — quantifiable measures of security program performance. Examples: patch compliance %, mean time to detect (MTTD), mean time to respond (MTTR), phishing click rate, vulnerability density. Metrics enable data-driven decisions, demonstrate ROI, and track improvement over time. Required for executive reporting and demonstrating compliance program effectiveness."
   }
 ];
 
